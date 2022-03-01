@@ -1,0 +1,81 @@
+// 2,3倍图适配
+@mixin images-icons($url){
+  background-image: url("~images/icons/" + $url + "@2x.png");
+  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3){
+    background-image: url("~images/icons/" + $url + "@3x.png");
+  }
+}
+@mixin images($url){
+  background-image: url("~images/" + $url + "@2x.png");
+  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3){
+    background-image: url("~images/" + $url + "@3x.png");
+  }
+}
+
+
+/*文本格式化，超出范围，显示省略号*/
+@mixin ellipsis($width:100%, $display:block, $clamp: 0) {
+  width: $width;
+  display: $display;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  @if ($clamp == 0) {
+    white-space: nowrap
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $clamp;
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* 清除浮动 */
+@mixin clearfix {
+  &:after {
+    clear: both;
+    content: '.';
+    display: block;
+    height: 0;
+    line-height: 0;
+    overflow: hidden;
+  }
+  *height: 1%;
+}
+
+/* 行高 */
+@mixin line-height ($height: 30px, $line-height: 30px) {
+  @if ($height != null) {
+    height: $height;
+  }
+  @if ($line-height != null) {
+    line-height: $height;
+  }
+}
+
+/* 画三角形 */
+@mixin triangle($width:10px,$direction:top,$color:$bgBlueLight) {
+  border: $width solid transparent;
+  @if ($direction == top) {    // 上三角
+    border-bottom-color: $color;
+  }
+  @if ($direction == bottom) { // 下三角
+    border-top-color: $color;
+  }
+  @if ($direction == left) {   // 左三角
+    border-right-color: $color;
+  }
+  @if ($direction == right) {  // 右三角
+    border-left-color: $color;
+  }
+}
+
+
+/* 画圆 */
+@mixin circle($size: 11px,$bg: #fff) {
+  border-radius: 50%;
+  width: $size;
+  height: $size;
+  line-height: $size;
+  text-align: center;
+  background: $bg;
+}
