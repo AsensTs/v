@@ -1,5 +1,5 @@
 <template>
-  <el-button type="success" size="mini">123</el-button>
+  <el-button type="success" size="large">123</el-button>
 </template>
 
 <script>
