@@ -1,4 +1,8 @@
 const path = require('path')
+// element-plus 自动导入
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 
 function resolve(src) {
   return path.join(__dirname, src);
@@ -17,6 +21,12 @@ module.exports = {
   },
   configureWebpack: {
     plugins: [
+      AutoImport({
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()],
+      }),
     ],
   }
 }

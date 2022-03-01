@@ -1,5 +1,5 @@
 <template>
-  Header
+  <el-button type="success" size="mini">123</el-button>
 </template>
 
 <script>
