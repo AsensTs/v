@@ -11,6 +11,7 @@ import '@styles/common.scss'
 import '@styles/reset.css'
 import '@styles/border.css'
 import 'animate.css'
+import '@assets/icon/iconfont/iconfont.css'
 
 
 const app = createApp(App)
