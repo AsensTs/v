@@ -9,6 +9,7 @@ import useElIcon from '@utils/element'
 import '@styles/common.scss'
 import '@styles/reset.css'
 import 'animate.css'
+import '@assets/icon/iconfont/iconfont.css'
 
 const app = createApp(App)
 

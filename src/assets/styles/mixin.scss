@@ -43,14 +43,42 @@
 }
 
 /* 行高 */
-@mixin line-height ($height: 30px, $line-height: 30px) {
-  @if ($height != null) {
-    height: $height;
-  }
+@mixin line-height ($height: 30px, $line-height: null) {
+  height: $height;
+  
   @if ($line-height != null) {
+    line-height: $line-height;
+  } @else {
     line-height: $height;
   }
 }
+
+
+/* 定位 */ 
+@mixin position ($position: relative, $top: null, $bottom: null, $left: null, $right: null) {
+  width: 100%;
+  position: $position;
+  
+  @if ($top != null) {
+    top: $top;
+  }
+  @if ($bottom != null) {
+    bottom: $bottom;
+  }
+  @if ($left != null) {
+    left: $left;
+  }
+  @if ($right != null) {
+    right: $right;
+  }
+}
+
+/* 垂直居中 */
+@mixin vertical {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} 
 
 /* 画三角形 */
 @mixin triangle($width:10px,$direction:top,$color:$bgBlueLight) {
