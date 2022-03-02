@@ -13,7 +13,6 @@ import '@styles/border.css'
 import 'animate.css'
 import '@assets/icon/iconfont/iconfont.css'
 
-
 const app = createApp(App)
 
 useVant(app.use)
