@@ -16,7 +16,15 @@ module.exports = {
       .set("@utils", resolve("./src/utils"))
   },
   configureWebpack: {
-    plugins: [
-    ],
+    devServer: {
+      port: 8088,
+      proxy: {
+        "/": {
+          target: "/"
+        }
+      },
+      hot: true
+    },
+    plugins: [],
   }
 }
