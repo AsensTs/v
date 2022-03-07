@@ -6,7 +6,7 @@ const routes = [
     name: 'Home',
     component: () => import(/* webpackChunkName: "about" */ '@views/Home.vue'),
     meta: {
-      depth: 1
+      depth: 1, // 路由层级
     }
   }
 ]
@@ -14,6 +14,13 @@ const routes = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+router.beforeEach((to, from) => {
+  console.log(to, from);
+  if (to.name == undefined) {
+    router.push('/')
+  }
 })
 
 export default router

@@ -7,7 +7,6 @@ import store from './store'
 import fastClick from 'fastclick'
 import es6Promise from 'es6-promise'
 import useVant from "@utils/vant"
-import '@styles/common.scss'
 import '@styles/reset.css'
 import '@styles/border.css'
 import 'animate.css'

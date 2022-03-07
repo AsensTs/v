@@ -81,9 +81,18 @@
     height: $height;
   }
   display: flex;
-  justify-content: center;
   align-items: center;
-} 
+}
+
+@mixin flex($height: null, $justify-content: center, $align-items: center) {
+  @if ($height != null) {
+    height: $height;
+  }
+  display: flex;
+  justify-content: $justify-content;
+  align-items: $align-items;
+  text-align: center;
+}
 
 /* 画三角形 */
 @mixin triangle($width:10px,$direction:top,$color:$bgBlueLight) {
