@@ -17,7 +17,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
-  console.log(to, from);
+  console.log(`to: ${to.path}` , `from: ${from.path}`);
   if (to.name == undefined) {
     router.push('/')
   }

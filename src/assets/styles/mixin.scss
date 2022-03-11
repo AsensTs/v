@@ -84,14 +84,14 @@
   align-items: center;
 }
 
-@mixin flex($height: null, $justify-content: center, $align-items: center) {
+@mixin flex($height: null, $justify-content: center, $align-items: center, $text-align: center) {
   @if ($height != null) {
     height: $height;
   }
   display: flex;
   justify-content: $justify-content;
   align-items: $align-items;
-  text-align: center;
+  text-align: $text-align;
 }
 
 /* 画三角形 */
