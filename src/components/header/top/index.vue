@@ -88,7 +88,7 @@ const handleSearch = (searchValue) => {
       padding-right: 5px;
       .user {
         .user-icon {
-          font-size: 25px;
+          font-size: 20px;
           color: $color;
         }
         .username {

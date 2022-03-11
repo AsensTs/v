@@ -26,12 +26,12 @@ const iconList = reactive({
 
 .header {
   background-color: $headerBgColor;
-  background-image: url(../assets/images/bg.jpg);
+  // background-image: url(../assets/images/bg.jpg);
   .header-top {
     height: 50px;
   }
   .header-nav {
-    @include flex(90px, space-around);
+    @include flex(100px, space-around);
     margin:0 10px;
   }
 }

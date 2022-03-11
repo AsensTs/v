@@ -2,14 +2,14 @@
   <div class="home">
     <Header></Header>
     <Main></Main>
-    <Bottom></Bottom>
+    <Footer></Footer>
   </div>
 </template>
 
 <script setup>
 import Header from './Header.vue'
 import Main from './Main.vue'
-import Bottom from './Bottom.vue'
+import Footer from './Footer.vue'
 </script>
 
 <style lang="scss" scoped>
