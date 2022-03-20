@@ -1,2 +1,3 @@
-# init
+# vue
+## init
 npm install
