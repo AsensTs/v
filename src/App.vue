@@ -1,35 +1,11 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition :enter-active-class="transitionClass" :leave-active-class="transitionClass">
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
-    </transition>
-  </router-view>
+  <App></App>
 </template>
 
 <script>
-import animate from '@utils/animate';
+import App from '@views/App.vue'
 export default {
   name: 'app',
-  data() {
-    return {
-      transitionClass: animate('fadeIn')
-    }
-  },
-  watch: {
-    $route (to, from) {
-      // 切页面动画
-      let toDepth = to.meta.depth;
-      let fromDepth = from.meta.depth;
-      if (fromDepth > toDepth) {
-        this.transitionClass = animate('fadeInLeft');
-      } else if (fromDepth < toDepth) {
-        this.transitionClass = animate('fadeInRight');
-      } else {
-        this.transitionClass = animate('fadeIn');
-      }
-    }
-  }
+  components: { App }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="row bottom">
+  <div class="row footer">
     <div class="col">
       <div class="item" v-for="(item, index) in state.navBottomData" :key="item.name + index">
         <div v-if="!item.name||item.name=='logo'" class="img"><img :src="item.logo" /></div>
@@ -44,17 +44,17 @@ const handleNavClick = (path, index) => {
 
 <style lang="scss" scoped>
 @import '@styles/mixin.scss';
-@import '@styles/common.scss';
+@import '@styles/variable.scss';
 
-.bottom {
+.footer {
   @include position(absolute, $bottom: 0);
-  background-color: $bottomBgColor;
+  background-color: $bg-color-bottom;
   border-top: 1px solid #eee;
   .col {
-    @include flex(50px, space-around);
+    @include flex($height-footer, space-around);
     .item {
       width: v-bind('state.navWidth');
-      @include flex(50px);
+      @include flex($height-footer);
       padding-top: 3px;
       .img {
         height: 100%;
@@ -63,11 +63,6 @@ const handleNavClick = (path, index) => {
         }
       }
       .icon-item {
-        .icon {
-          .van-icon {
-            font-size: 24px;
-          }
-        }
         .title {
           font-size: 12px;
         }

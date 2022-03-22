@@ -11,7 +11,7 @@ import HeaderTop from '@components/header/top'
 import Navigation from '@components/header/navigation'
 const iconList = reactive({
   navData: [
-    { name: "orders-o", title: "变", path: "/1"},
+    { name: "orders-o", title: "变", path: "/substationCheck"},
     { name: "comment-o", title: "许", path: "/2"},
     { name: "description", title: "预", path: ""},
     { name: "pause-circle-o", title: "启", path: ""},
@@ -22,16 +22,16 @@ const iconList = reactive({
 </script>
 <style lang="scss" scoped>
 @import '@styles/mixin.scss';
-@import '@styles/common.scss';
+@import '@styles/variable.scss';
 
 .header {
-  background-color: $headerBgColor;
+  background-color: $bg-color-header;
   // background-image: url(../assets/images/bg.jpg);
   .header-top {
-    height: 50px;
+    height: $height-top;
   }
   .header-nav {
-    @include flex(100px, space-around);
+    @include flex($height-nav, space-around);
     margin:0 10px;
   }
 }

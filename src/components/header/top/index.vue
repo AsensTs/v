@@ -13,7 +13,7 @@
     <div class="user-mod">
       <div class="user">
         <i class="iconfont icon-switchuser user-icon"></i>
-        <p class="username">user</p>
+        <p class="username">{{authUser}}</p>
       </div>
     </div>
   </div>
@@ -21,9 +21,12 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue"
+import { defineProps, ref } from "vue"
 import Search from '@components/search'
 import { suffix } from "@utils/base"
+import { useStore } from "vuex";
+
+
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
   title: {
@@ -43,17 +46,25 @@ const props = defineProps({
     default: false
   },
 })
-
+const store = useStore();
+const authUser = ref(store.getters['common/authUser'])
 const getSuffix = suffix;
+
+
+
+// 搜索
 const handleSearch = (searchValue) => {
   console.log(searchValue, "父组件接收");
 }
+
+// 
+
 
 </script>
 
 <style lang="scss" scoped>
 @import '@styles/mixin.scss';
-@import '@styles/common.scss';
+@import '@styles/variable.scss';
 
 .header-top {
   display: flex;
@@ -63,12 +74,12 @@ const handleSearch = (searchValue) => {
     width: 100px;
     min-width: 0;
     padding: 0 8px;
-    color: $color;
+    color: $text-primary;
     font-weight: bold;
     text-align: center;
   }
   .top-center {
-    color: $color;
+    color: $text-primary;
     line-height: 50px;
     .title {
       font-size: 16px;
@@ -82,18 +93,21 @@ const handleSearch = (searchValue) => {
   }
   .top-right {
     display: flex;
-    
     .user-mod {
       @include flex();
       padding-right: 5px;
+      width: 50px;
       .user {
         .user-icon {
           font-size: 20px;
-          color: $color;
+          color: $text-primary;
         }
         .username {
+          @include ellipsis(50px);
           line-height: 0.7; 
-          color: $color;
+          color: $text-primary;
+          font-size: 12px;
+          padding-top: 3px;
         }
       }
     }

@@ -4,7 +4,15 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import(/* webpackChunkName: "about" */ '@views/Home.vue'),
+    component: () => import(/* webpackChunkName: "about" */ '@components/home'),
+    meta: {
+      depth: 1, // 路由层级
+    }
+  },
+  {
+    path: '/substationCheck',
+    name: 'substationCheck',
+    component: () => import(/* webpackChunkName: "about" */ '@components/substationCheck'),
     meta: {
       depth: 1, // 路由层级
     }
