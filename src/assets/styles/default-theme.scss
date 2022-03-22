@@ -1,0 +1,22 @@
+@import './variable.scss';
+// #app {
+//   font-family: Avenir, Helvetica, Arial, sans-serif;
+//   -webkit-font-smoothing: antialiased;
+//   -moz-osx-font-smoothing: grayscale;
+//   text-align: center;
+// }
+
+// icon
+.van-icon {
+  font-size: 24px;
+}
+
+// dropdown
+.van-dropdown-menu__bar {
+  box-shadow: none;
+}
+.van-ellipsis {
+  color: #7d8084;
+  font-size: 14px;
+  font-weight: bold;
+}

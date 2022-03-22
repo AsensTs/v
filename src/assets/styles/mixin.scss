@@ -14,8 +14,10 @@
 
 
 /*文本格式化，超出范围，显示省略号*/
-@mixin ellipsis($width:100%, $display:block, $clamp: 0) {
-  width: $width;
+@mixin ellipsis($width:null, $display:block, $clamp: 0) {
+  @if ($width != null) {
+    width: $width;
+  }
   display: $display;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -74,26 +76,38 @@
 }
 
 /* 垂直居中 */
-@mixin vertical {
+@mixin vertical($height: null) {
+  @if ($height != null) {
+    height: $height;
+  }
   display: flex;
-  justify-content: center;
   align-items: center;
-} 
+}
+
+@mixin flex($height: null, $justify-content: center, $align-items: center, $text-align: center) {
+  @if ($height != null) {
+    height: $height;
+  }
+  display: flex;
+  justify-content: $justify-content;
+  align-items: $align-items;
+  text-align: $text-align;
+}
 
 /* 画三角形 */
-@mixin triangle($width:10px,$direction:top,$color:$bgBlueLight) {
+@mixin triangle($width:10px,$direction:top,$text-primary:$bgBlueLight) {
   border: $width solid transparent;
   @if ($direction == top) {    // 上三角
-    border-bottom-color: $color;
+    border-bottom-color: $text-primary;
   }
   @if ($direction == bottom) { // 下三角
-    border-top-color: $color;
+    border-top-color: $text-primary;
   }
   @if ($direction == left) {   // 左三角
-    border-right-color: $color;
+    border-right-color: $text-primary;
   }
   @if ($direction == right) {  // 右三角
-    border-left-color: $color;
+    border-left-color: $text-primary;
   }
 }
 

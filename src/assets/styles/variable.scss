@@ -1,0 +1,38 @@
+
+$primary: #0073e6;
+$primary-hover: #0080ff;
+$success: #67C23A;
+$success-hover: #83f549;
+$warning: #f0a639;
+$warning-hover: #ffb13b;
+$info: #909399;
+$info-hover: #c1c4c9;
+$danger: #f74747;
+$danger-hover: #fc7171;
+
+// text-color
+$text-white: #eee;
+$text-white-hover: #ffffff;
+$text-black: #333333;
+$text-black-hover: #000000;
+$text-primary: #f7f8fa;
+$text-primary-hover: #f7f8fa;
+$placeholder: #C0C4CC;
+
+// bg-color
+$bg-color: #fff;
+$bg-color-header: #13418e;
+$bg-color-bottom: #fff;
+
+// border-color
+$border-base: #dcdfe6;
+$border-light: #e4e7ed;
+$border-Lighter: #ebeef5;
+$border-Extralight: #f2f6fc;
+
+// height
+$height-header: 150px;
+$height-top: 50px;
+$height-nav: 100px;
+$height-footer: 50px;
+$height-main: calc(100% - #{$height-top} - #{$height-nav} - #{$height-footer});
