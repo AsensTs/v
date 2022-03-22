@@ -14,6 +14,7 @@ module.exports = {
       .set("@views", resolve("./src/views"))
       .set("@components", resolve("./src/components"))
       .set("@utils", resolve("./src/utils"))
+      .set("@apis", resolve("./src/apis"))
   },
   configureWebpack: {
     plugins: [
