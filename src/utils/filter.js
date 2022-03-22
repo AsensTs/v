@@ -27,7 +27,7 @@ const trim = function (str, trim) {
  * 2. {{ '2018-09-14 01:05' | formaDate(yyyy-MM-dd) }} 
  * 3. {{ '2018-09-14 01:05' | formaDate(MM/dd) }}
  * */
-const formaDate = function (value, fmt) {
+const formaDate = (value, fmt) => {
   var date = new Date(value);
   var o = {
     "M+": date.getMonth() + 1, //月份

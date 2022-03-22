@@ -95,19 +95,19 @@
 }
 
 /* 画三角形 */
-@mixin triangle($width:10px,$direction:top,$color:$bgBlueLight) {
+@mixin triangle($width:10px,$direction:top,$text-primary:$bgBlueLight) {
   border: $width solid transparent;
   @if ($direction == top) {    // 上三角
-    border-bottom-color: $color;
+    border-bottom-color: $text-primary;
   }
   @if ($direction == bottom) { // 下三角
-    border-top-color: $color;
+    border-top-color: $text-primary;
   }
   @if ($direction == left) {   // 左三角
-    border-right-color: $color;
+    border-right-color: $text-primary;
   }
   @if ($direction == right) {  // 右三角
-    border-left-color: $color;
+    border-left-color: $text-primary;
   }
 }
 

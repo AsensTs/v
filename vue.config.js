@@ -14,13 +14,14 @@ module.exports = {
       .set("@views", resolve("./src/views"))
       .set("@components", resolve("./src/components"))
       .set("@utils", resolve("./src/utils"))
+      .set("@apis", resolve("./src/apis"))
   },
   configureWebpack: {
     devServer: {
       port: 8088,
       proxy: {
         "/": {
-          target: "/"
+          target: "http://192.168.3.106:8002/",
         }
       },
       hot: true
