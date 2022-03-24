@@ -18,3 +18,17 @@ export function user_type () {
     method: 'GET',
   })
 }
+
+export function user_logout() {
+  return axios({
+    url: '/api/user_login_log/user_logout',
+    method: 'post'
+  })
+}
+
+export function logout() {
+  return axios({
+    url: '/logout',
+    method: 'post'
+  })
+}
