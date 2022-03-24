@@ -1,16 +1,13 @@
 <template>
   <div class="main">
     <router-view v-slot="{ Component }">
-      <transition :enter-active-class="enter" :leave-active-class="leave">
-        <keep-alive>
-          <component :is="Component" class="component"/>
-        </keep-alive>
-      </transition>
+    <transition :enter-active-class="enter" :leave-active-class="leave">
+      <keep-alive>
+        <component :is="Component" class="component"/>
+      </keep-alive>
+    </transition>
     </router-view>
   </div>
-  <!-- <transition :enter-active-class="enter" :leave-active-class="leave"> -->
-    <!-- <router-view></router-view> -->
-  <!--</transition> -->
 </template>
 
 <script>
@@ -18,8 +15,13 @@ import animate from '@utils/animate'
 export default {
   data() {
     return {
-      enter: animate('fadeInLeft'),
-      leave: animate('fadeInLeft')
+      enter: animate('fadeInRight'),
+      leave: animate('fadeOutLeft')
+    }
+  },
+  computed:{
+    key() {
+      return this.$route.path
     }
   },
   watch: {
@@ -35,7 +37,7 @@ export default {
         this.enter = animate('fadeInRight');
         this.leave = animate('fadeInRight');
       } else {
-        this.enter = animate('fadeInLeft');
+        this.enter = animate('fadeInRight');
         this.leave = animate('fadeOutLeft');
       }
     }

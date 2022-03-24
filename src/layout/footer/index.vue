@@ -22,7 +22,7 @@ const state = reactive({
   navBottomData: [
     { name: "安全管控", icon: "orders-o", activeIcon: "",  path: "./123" },
     { name: "专家库", icon: "comment-circle-o",activeIcon: "", path: "" },
-    { name: "logo", logo: require('../assets/images/logo1.png'), path: "" },
+    { name: "logo", logo: require('@assets/images/logo1.png'), path: "" },
     { name: "设置", icon: "setting-o", activeIcon: "", path: "" },
     { name: "我的", icon: "user-circle-o", activeIcon: "", path: "" },
   ],

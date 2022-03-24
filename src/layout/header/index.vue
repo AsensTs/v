@@ -7,8 +7,8 @@
 
 <script setup>
 import { reactive } from '@vue/reactivity'
-import HeaderTop from '@components/header/top'
-import Navigation from '@components/header/navigation'
+import HeaderTop from './top'
+import Navigation from './navigation'
 const iconList = reactive({
   navData: [
     { name: "orders-o", title: "变", path: "/substationCheck"},

@@ -1,21 +1,28 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
+import Layout from '@layout' 
+
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: () => import(/* webpackChunkName: "about" */ '@components/home'),
-    meta: {
-      depth: 1, // 路由层级
-    }
+    redirect: '/home'
   },
   {
-    path: '/substationCheck',
-    name: 'substationCheck',
-    component: () => import(/* webpackChunkName: "about" */ '@components/substationCheck'),
-    meta: {
-      depth: 1, // 路由层级
-    }
+    path: '/home',
+    name: 'Home',
+    component: Layout,
+    children: [
+      {
+        path: '/substationCheck',
+        name: 'substationCheck',
+        component: () => import(/* webpackChunkName: "about" */ '@views/substationCheck'),
+      }
+    ]
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import(/* webpackChunkName: "about" */ '@views/login'),
   }
 ]
 

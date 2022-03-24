@@ -5,16 +5,17 @@ function resolve(src) {
 }
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/' : './',
+  publicPath: '/',
   chainWebpack: config => {
     config.resolve.alias
       .set("@", resolve("./src"))
-      .set("@assets", resolve("./src/assets"))
-      .set("@styles", resolve("./src/assets/styles"))
-      .set("@views", resolve("./src/views"))
-      .set("@components", resolve("./src/components"))
-      .set("@utils", resolve("./src/utils"))
       .set("@apis", resolve("./src/apis"))
+      .set("@utils", resolve("./src/utils"))
+      .set("@views", resolve("./src/views"))
+      .set("@assets", resolve("./src/assets"))
+      .set("@layout", resolve("./src/layout"))
+      .set("@styles", resolve("./src/assets/styles"))
+      .set("@components", resolve("./src/components"))
   },
   configureWebpack: {
     devServer: {

@@ -62,7 +62,7 @@ export default {
 
     // 获取 station ticket 数据
     const getStationTicket = async () => {
-      let {data: res} = await axios.get(apis.station_ticket + authUser + '/all', {
+      let res = await axios.get(apis.station_ticket + authUser + '/all', {
         params: {
           status: "已生成",
           offset: 0,
