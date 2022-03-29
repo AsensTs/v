@@ -7,6 +7,7 @@ import store from './store'
 import fastClick from 'fastclick'
 import es6Promise from 'es6-promise'
 import useVant from "@utils/vant"
+import { title } from './settings'
 import './permission'
 import '@styles/reset.css'
 import '@styles/border.css'
@@ -14,6 +15,7 @@ import 'animate.css'
 import '@assets/icon/iconfont/iconfont.css'
 import '@styles/default-theme.scss'
 
+store.dispatch('common/appTitle', title)
 const app = createApp(App)
 
 useVant(app.use)

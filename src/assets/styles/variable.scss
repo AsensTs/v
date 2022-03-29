@@ -32,8 +32,9 @@ $border-Lighter: #ebeef5;
 $border-Extralight: #f2f6fc;
 
 // height
-$height-header: 150px;
-$height-top: 50px;
-$height-nav: 100px;
+$height-header: 100px;
+$height-header-top: 50px;
+$height-htop-item: 60px;
+$height-header-bottom: 60px;
 $height-footer: 50px;
-$height-main: calc(100% - #{$height-top} - #{$height-nav} - #{$height-footer});
+$height-main: calc(100% - #{$height-header-top} - #{$height-header-bottom} - #{$height-footer});

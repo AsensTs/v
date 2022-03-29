@@ -1,24 +1,22 @@
 <template>
 <div class="header">
-  <HeaderTop logo="" title="一体化平台" search></HeaderTop>
-  <Navigation :navData="iconList.navData" class="header-nav"></Navigation>
+  <HeaderTop :title="title" search></HeaderTop>
+  <div class="header-bottom-container">
+    <Search @handleSearch="handleSearch" width="100" placeholder="请输入搜索关键词"></Search>
+  </div>
 </div>
 </template>
 
 <script setup>
-import { reactive } from '@vue/reactivity'
 import HeaderTop from './top'
-import Navigation from './navigation'
-const iconList = reactive({
-  navData: [
-    { name: "orders-o", title: "变", path: "/substationCheck"},
-    { name: "comment-o", title: "许", path: "/2"},
-    { name: "description", title: "预", path: ""},
-    { name: "pause-circle-o", title: "启", path: ""},
-    { name: "records", title: "调", path: ""},
-    { name: "guide-o", title: "输", path: ""},
-  ],
-})
+import Search from '@components/search'
+import { useStore } from 'vuex'
+
+const store = useStore();
+const title = store.getters['common/appTitle']
+const handleSearch = (searchValue) => {
+  console.log(searchValue, "父组件接收");
+}
 </script>
 <style lang="scss" scoped>
 @import '@styles/mixin.scss';
@@ -26,12 +24,11 @@ const iconList = reactive({
 
 .header {
   background-color: $bg-color-header;
-  // background-image: url(../assets/images/bg.jpg);
   .header-top {
-    height: $height-top;
+    height: $height-header-top;
   }
-  .header-nav {
-    @include flex($height-nav, space-around);
+  .header-bottom-container {
+    @include flex($height-header-bottom, space-around);
     margin:0 10px;
   }
 }

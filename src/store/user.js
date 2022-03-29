@@ -1,27 +1,28 @@
-import { login, login_validate, user_type } from '@apis/user.js'
-import { Notify } from 'vant';
-import { setToken } from '@utils/auth'
+import { login, login_validate, user_type, user_logout } from '@apis/user.js'
+import { setToken, removeToken } from '@utils/auth';
+import { Toast } from 'vant';
 
 const state = {
-  username: '',
-  password: ''
+  authName: '' || JSON.parse(window.localStorage.getItem('vuex')).user.authName
 }
 
 const mutations = {
-  'LOGIN': (state, data) => {
-    state.username = data.username;
-    state.password = data.password;
+  'LOGIN': (state, value) => {
+    state.authName = value;
+  },
+  'LOGOUT': (state) => {
+    console.log("退出登录", state.authName);
   }
 }
 
 const actions = {
-  login: async ({commit}, data) => {
+  login: ({commit}, data) => {
     const { username, password } = data;
     return new Promise((reslove, reject) => {
       // 登录用户验证
       login_validate({userName: username}).then((res) => {
         if (res.data) {
-          Notify({ type: 'danger', message: res.data });
+          Toast.fail(res.data);
           return;
         }
         
@@ -35,11 +36,11 @@ const actions = {
               setToken("userType", res.data.type);
               setToken("gsbds", res.data.gsbds);
               setToken("gsyw", res.data.gsyw);
-              commit('LOGIN', data);
-              Notify({ type: 'success', message: "登陆成功！" });
+              commit('LOGIN', username);
+              Toast.success("登陆成功！");
               reslove();
             } else {
-              Notify({ type: 'danger', message: "登陆失败,用户名或密码错误！" });
+              Toast.fail("登陆失败,用户名或密码错误！");
             }
           })
         })
@@ -47,11 +48,23 @@ const actions = {
         reject(error)
       })
     })
+  },
+  logout({commit}) {
+    
+    return new Promise((reslove, reject) => {
+      user_logout().then(() => {
+        removeToken();
+        commit('LOGOUT');
+        reslove();
+      }).catch((error)=>{
+        reject(error)
+      })
+    })
   }
 }
 
 const getters = {
-  getUser: () => state.username
+  authUser: () => state.authName
 }
 
 

@@ -9,9 +9,8 @@
     <p v-else class="subtitle">{{ subtitle }}</p>
   </div>
   <div class="top-right" v-if="search">
-    <Search @handleSearch="handleSearch"></Search>
     <div class="user-mod">
-      <div class="user">
+      <div class="user" @click="logout">
         <i class="iconfont icon-switchuser user-icon"></i>
         <p class="username">{{authUser}}</p>
       </div>
@@ -22,10 +21,10 @@
 
 <script setup>
 import { defineProps, ref } from "vue"
-import Search from '@components/search'
 import { suffix } from "@utils/base"
 import { useStore } from "vuex";
-
+import { useRouter } from "vue-router";
+import { Dialog } from 'vant';
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
@@ -47,19 +46,26 @@ const props = defineProps({
   },
 })
 const store = useStore();
-const authUser = ref(store.getters['common/authUser'])
+const router = useRouter();
+console.log(store);
+const authUser = ref(store.getters['user/authUser']);
 const getSuffix = suffix;
+// const VanDialog = Dialog.Component;
 
-
-
-// 搜索
-const handleSearch = (searchValue) => {
-  console.log(searchValue, "父组件接收");
+// logout
+const logout = () => {
+  Dialog.alert({
+    title: '退出登录',
+    message: '正在退出登录，是否确认退出？',
+    overlay: true,
+    closeOnClickOverlay: true,
+    theme: 'round-button',
+  }).then(async () => {
+    // Dialog.close()
+    await store.dispatch('user/logout');
+    router.push('/login');
+  });
 }
-
-// 
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -71,8 +77,7 @@ const handleSearch = (searchValue) => {
   justify-content: space-between;
   flex-wrap: nowrap;
   .top-left {
-    width: 100px;
-    min-width: 0;
+    min-width: $height-htop-item; // 60px
     padding: 0 8px;
     color: $text-primary;
     font-weight: bold;
@@ -96,14 +101,14 @@ const handleSearch = (searchValue) => {
     .user-mod {
       @include flex();
       padding-right: 5px;
-      width: 50px;
+      width: $height-htop-item;
       .user {
         .user-icon {
           font-size: 20px;
           color: $text-primary;
         }
         .username {
-          @include ellipsis(50px);
+          @include ellipsis($height-htop-item);
           line-height: 0.7; 
           color: $text-primary;
           font-size: 12px;

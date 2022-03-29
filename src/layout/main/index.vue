@@ -26,7 +26,6 @@ export default {
   },
   watch: {
     $route (to, from) {
-      console.log(to,from);
       // 切页面动画
       let toDepth = to.meta.depth;
       let fromDepth = from.meta.depth;

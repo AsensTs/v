@@ -1,6 +1,21 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-
+import { navigator } from '@/settings'
 import Layout from '@layout' 
+
+const setNavigator = () => {
+  let nav= []
+  if (navigator) {
+    navigator.forEach((item) => {
+      nav.push({
+        path: `/${item.name}`,
+        name: item.name,
+        component: () => import(/* webpackChunkName: "about" */ `@views/${item.name}`),
+        meta: item.meta
+      })
+    })
+  }
+  return nav;
+}
 
 const routes = [
   {
@@ -11,13 +26,8 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: Layout,
-    children: [
-      {
-        path: '/substationCheck',
-        name: 'substationCheck',
-        component: () => import(/* webpackChunkName: "about" */ '@views/substationCheck'),
-      }
-    ]
+    redirect: '/substationCheck',
+    children: setNavigator()
   },
   {
     path: '/login',
@@ -25,6 +35,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '@views/login'),
   }
 ]
+
 
 const router = createRouter({
   history: createWebHashHistory(),

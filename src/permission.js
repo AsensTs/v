@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import router from './router'
 import store from './store'
+import { Toast } from 'vant';
 import { getToken } from '@utils/auth' // get token from cookie
 import getPageTitle from '@utils/get-page-title'
 
@@ -12,10 +13,10 @@ router.beforeEach((to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken();
-  console.log(hasToken);
 
   if (hasToken) {
-    if (to.path == 'login') {
+    if (to.path == '/login') {
+      Toast.success("已登录！");
       next({ path: '/home' });
     } else {
       next();

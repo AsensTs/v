@@ -1,21 +1,21 @@
 const state = {
-  authUser: '佛山供电局'
+  appTitle: '' || JSON.parse(window.localStorage.getItem('vuex')).common.appTitle
 }
 
 const mutations = {
-  'AUTH_USER': (state, value) => {
-    state.authUser = value;
+  'APP_TITLE': (state, value) => {
+    state.appTitle = value;
   }
 }
 
 const actions = {
-  authUser: ({commit}, value) => {
-    commit('AUTH_USER', value)
+  appTitle: ({commit}, value) => {
+    commit('APP_TITLE', value)
   }
 }
 
 const getters = {
-  authUser: () => state.authUser
+  appTitle: () => state.appTitle
 }
 
 

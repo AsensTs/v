@@ -1,11 +1,11 @@
 <template>
   <div class="row footer">
     <div class="col">
-      <div class="item" v-for="(item, index) in state.navBottomData" :key="item.name + index">
-        <div v-if="!item.name||item.name=='logo'" class="img"><img :src="item.logo" /></div>
+      <div class="item" v-for="(item, index) in navigator" :key="item.title + index">
+        <div v-if="!item.title||item.title=='logo'" class="img"><img :src="item.logo" /></div>
         <div v-else class="icon-item" @click="handleNavClick(item.path, index)" :style="{ color: activeIndex == index ? 'rgb(19 65 142)' : ''}">
           <p class="icon"><van-icon :name="activeIndex == index ? (item.activeIcon ? item.activeIcon : item.icon) : item.icon"/></p>
-          <p class="title">{{item.name}}</p>
+          <p class="title">{{item.title}}</p>
         </div>
       </div>
     </div>
@@ -15,23 +15,18 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { navigator } from '@/settings'
 
+console.log(navigator);
 const router = useRouter();
 
 const state = reactive({
-  navBottomData: [
-    { name: "安全管控", icon: "orders-o", activeIcon: "",  path: "./123" },
-    { name: "专家库", icon: "comment-circle-o",activeIcon: "", path: "" },
-    { name: "logo", logo: require('@assets/images/logo1.png'), path: "" },
-    { name: "设置", icon: "setting-o", activeIcon: "", path: "" },
-    { name: "我的", icon: "user-circle-o", activeIcon: "", path: "" },
-  ],
   navWidth: 'red'
 })
 const activeIndex = ref(0)
 
 state.navWidth = (() => {
-  let len = state.navBottomData.length;
+  let len = navigator.length;
   return 100/len + '%';
 })();
 
@@ -63,8 +58,13 @@ const handleNavClick = (path, index) => {
         }
       }
       .icon-item {
+        .icon {
+          .van-icon {
+            font-weight: 500;
+          }
+        }
         .title {
-          font-size: 12px;
+          font-size: 11px;
         }
       }
     }

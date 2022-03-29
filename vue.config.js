@@ -19,7 +19,7 @@ module.exports = {
   },
   configureWebpack: {
     devServer: {
-      port: 8088,
+      port: 8099,
       proxy: {
         "/": {
           target: "http://192.168.3.106:8002/",

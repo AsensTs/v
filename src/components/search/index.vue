@@ -1,17 +1,31 @@
 <template>
-  <div class="search-mod" ref="searchContainerRef" @click="handleClickSearchBox">
+  <div v-if="collapse" class="search-mod-collapse" ref="searchContainerRef" @click="handleClickSearchBox">
     <van-search ref="searchRef" v-model="searchValue" @search="handleClickSearch" @blur="handleSearchBlur" clearable placeholder="请输入搜索关键词" shape="round" />
+  </div>
+  <div v-else class="search-mod" :style={width:formattWidth(width)}>
+    <van-search v-model="searchValue" @search="handleClickSearch" placeholder="请输入搜索关键词" clearable  shape="round" v-bind="$attrs"/>
   </div>
 </template>
 
 <script setup>
-import { ref, toRaw, defineEmits } from "vue"
+import { ref, toRaw, defineEmits, defineProps } from "vue"
 import { setClassName, delClassName } from "@utils/base"
 const showInput = ref(false);
 const searchContainerRef = ref('searchContainerRef');
 const searchRef = ref('searchRef');
 const searchValue = ref(null);
 const emit = defineEmits(['handleSearch']);
+const props = defineProps({
+  width: {
+    type: String,
+    default: "100%"
+  },
+  collapse: {
+    type: Boolean,
+    default: false
+  }
+})
+console.log(props);
 
 // 展开输入框
 function handleClickSearchBox() {
@@ -36,14 +50,27 @@ function handleSearchBlur() {
 function searchFocus() {
   searchRef.value.focus();
 }
+// 格式化宽度
+function formattWidth(width) {
+  let w = width;
+  if (w.indexOf('%') !== -1 || w.indexOf('px') !== -1 || w.indexOf('rem') !== -1 || w.indexOf('em') !== -1 || w.indexOf('vw') !== -1 || w.indexOf('vh') !== -1) {
+    return w;
+  } else {
+    w += '%'
+  }
+  return w;
+}
 </script>
 
 <style lang="scss" scoped>
-.search-mod {
+.search-mod-collapse {
   width: 60px;
-  .van-search {
-    background-color: rgba(255, 255, 255, 0);
-  }
+}
+.search-mod {
+  width: 100%;
+}
+.van-search {
+  background-color: rgba(255, 255, 255, 0);
 }
 
 .toggle-show {
