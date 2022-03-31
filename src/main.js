@@ -7,7 +7,7 @@ import store from './store'
 import fastClick from 'fastclick'
 import es6Promise from 'es6-promise'
 import useVant from "@utils/vant"
-import { title } from './settings'
+import { title } from './config'
 import './permission'
 import '@styles/reset.css'
 import '@styles/border.css'

@@ -1,5 +1,5 @@
 
-import defaultSettings from '@/settings'
+import defaultSettings from '@/config'
 
 const title = defaultSettings.title || '一体化安全管控'
 export default function getPageTitle(pageTitle) {

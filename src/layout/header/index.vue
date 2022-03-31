@@ -2,21 +2,18 @@
 <div class="header">
   <HeaderTop :title="title" search></HeaderTop>
   <div class="header-bottom-container">
-    <Search @handleSearch="handleSearch" width="100" placeholder="请输入搜索关键词"></Search>
+    <searchInput width="100" placeholder="请输入搜索关键词" searchpage></searchInput>
   </div>
 </div>
 </template>
 
 <script setup>
 import HeaderTop from './top'
-import Search from '@components/search'
+import searchInput from '@components/search/searchInput'
 import { useStore } from 'vuex'
 
 const store = useStore();
 const title = store.getters['common/appTitle']
-const handleSearch = (searchValue) => {
-  console.log(searchValue, "父组件接收");
-}
 </script>
 <style lang="scss" scoped>
 @import '@styles/mixin.scss';

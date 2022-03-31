@@ -1,20 +1,26 @@
 <template>
   <div v-if="collapse" class="search-mod-collapse" ref="searchContainerRef" @click="handleClickSearchBox">
-    <van-search ref="searchRef" v-model="searchValue" @search="handleClickSearch" @blur="handleSearchBlur" clearable placeholder="请输入搜索关键词" shape="round" />
+    <van-search ref="searchRef" v-model="searchValue" @search="handleClickSearch" @blur="handleSearchBlurToCollapse" clearable placeholder="请输入搜索关键词" shape="round" />
   </div>
+
   <div v-else class="search-mod" :style={width:formattWidth(width)}>
-    <van-search v-model="searchValue" @search="handleClickSearch" placeholder="请输入搜索关键词" clearable  shape="round" v-bind="$attrs"/>
+    <van-search  @focus="handleOpenSearchPage"  placeholder="请输入搜索关键词" clearable  shape="round" v-bind="$attrs"/>
   </div>
 </template>
 
 <script setup>
+
 import { ref, toRaw, defineEmits, defineProps } from "vue"
 import { setClassName, delClassName } from "@utils/base"
+import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 const showInput = ref(false);
 const searchContainerRef = ref('searchContainerRef');
 const searchRef = ref('searchRef');
 const searchValue = ref(null);
 const emit = defineEmits(['handleSearch']);
+const route = useRoute();
+const store = useStore();
 const props = defineProps({
   width: {
     type: String,
@@ -27,7 +33,9 @@ const props = defineProps({
 })
 console.log(props);
 
-// 展开输入框
+console.log(route);
+
+// Expand the input field
 function handleClickSearchBox() {
   showInput.value = true;
   let dom = toRaw(searchContainerRef.value);
@@ -35,22 +43,33 @@ function handleClickSearchBox() {
   setClassName(dom, 'toggle-show');
   searchFocus();
 }
-// 提交搜索
+// Submitted to the search
 function handleClickSearch () {
   console.log('搜索内容', searchValue);
   emit('handleSearch', searchValue);
 }
-// 失去焦点
-function handleSearchBlur() {
+// Lose focus
+function handleSearchBlurToCollapse() {
   let dom = toRaw(searchContainerRef.value);
   delClassName(dom, 'toggle-show');
   setClassName(dom, 'toggle-hide');
 }
-// 获取焦点
+// Focus
 function searchFocus() {
   searchRef.value.focus();
 }
-// 格式化宽度
+// Get focus to open the search page
+function handleOpenSearchPage() {
+  switch (route.fullPath) {
+    case '/substationCheck':
+      console.log('/substationCheck');
+      store.dispatch('search/ssc_search', true);
+      break;
+    default: break;
+  }
+}
+
+// Formatting width
 function formattWidth(width) {
   let w = width;
   if (w.indexOf('%') !== -1 || w.indexOf('px') !== -1 || w.indexOf('rem') !== -1 || w.indexOf('em') !== -1 || w.indexOf('vw') !== -1 || w.indexOf('vh') !== -1) {
@@ -60,6 +79,8 @@ function formattWidth(width) {
   }
   return w;
 }
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -68,9 +89,6 @@ function formattWidth(width) {
 }
 .search-mod {
   width: 100%;
-}
-.van-search {
-  background-color: rgba(255, 255, 255, 0);
 }
 
 .toggle-show {

@@ -1,5 +1,7 @@
+import { getStorage } from '@utils/localStorage';
+
 const state = {
-  appTitle: '' || JSON.parse(window.localStorage.getItem('vuex')).common.appTitle
+  appTitle: '' || getStorage("common/appTitle")
 }
 
 const mutations = {

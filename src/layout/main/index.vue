@@ -1,7 +1,7 @@
 <template>
-  <div class="main">
+  <div class="main" id="main">
     <router-view v-slot="{ Component }">
-    <transition :enter-active-class="enter" :leave-active-class="leave">
+    <transition :enter-active-class="enter + 'animate__faster'" :leave-active-class="leave">
       <keep-alive>
         <component :is="Component" class="component"/>
       </keep-alive>
@@ -12,11 +12,12 @@
 
 <script>
 import animate from '@utils/animate'
+import touch from '@utils/touchs'
 export default {
   data() {
     return {
-      enter: animate('fadeInRight'),
-      leave: animate('fadeOutLeft')
+      enter: animate('fadeIn'),
+      leave: animate('fadeOut')
     }
   },
   computed:{
@@ -30,16 +31,20 @@ export default {
       let toDepth = to.meta.depth;
       let fromDepth = from.meta.depth;
       if (fromDepth > toDepth) {
-        this.enter = animate('fadeInLeft');
-        this.leave = animate('fadeInLeft');
+        this.enter = animate('fadeIn');
+        this.leave = animate('fadeIn');
       } else if (fromDepth < toDepth) {
-        this.enter = animate('fadeInRight');
-        this.leave = animate('fadeInRight');
+        this.enter = animate('fadeIn');
+        this.leave = animate('fadeIn');
       } else {
-        this.enter = animate('fadeInRight');
-        this.leave = animate('fadeOutLeft');
+        this.enter = animate('fadeIn');
+        this.leave = animate('fadeOut');
       }
     }
+  },
+  mounted() {
+    const mainDom = document.getElementById('main');
+    touch(mainDom);
   }
 }
 </script>

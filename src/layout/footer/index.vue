@@ -3,7 +3,7 @@
     <div class="col">
       <div class="item" v-for="(item, index) in navigator" :key="item.title + index">
         <div v-if="!item.title||item.title=='logo'" class="img"><img :src="item.logo" /></div>
-        <div v-else class="icon-item" @click="handleNavClick(item.path, index)" :style="{ color: activeIndex == index ? 'rgb(19 65 142)' : ''}">
+        <div v-else :class="['icon-item', activeIndex == index ? 'activeColor' : '']" @click="handleNavClick(item.path, index)">
           <p class="icon"><van-icon :name="activeIndex == index ? (item.activeIcon ? item.activeIcon : item.icon) : item.icon"/></p>
           <p class="title">{{item.title}}</p>
         </div>
@@ -15,13 +15,12 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
-import { navigator } from '@/settings'
+import { navigator } from '@/config'
 
-console.log(navigator);
 const router = useRouter();
 
 const state = reactive({
-  navWidth: 'red'
+  navWidth: 0
 })
 const activeIndex = ref(0)
 

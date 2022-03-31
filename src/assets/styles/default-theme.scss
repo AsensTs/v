@@ -27,6 +27,25 @@
   font-size: 12px !important;
 }
 
-.van-cell {
-  padding: 5px 16px;
+.van-search {
+  background-color: rgba(255, 255, 255, 0);
+}
+
+// nav active Color
+.activeColor {
+  color: $activeColor;
+  font-weight: bold;
+}
+
+// search page
+.search-page {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #fff;
+  z-index: 2001;
 }

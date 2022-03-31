@@ -10,8 +10,17 @@ const setClassName = (dom, str) => {
 
 const delClassName = (dom, str) =>  {
   let className = dom.className;
-  let arr = className.split(' ');
-  if (arr.indexOf(str) !== -1) {
+  if (className === undefined ) {
+    return;
+  }
+  
+  if (className.indexOf(' ')) {
+    let arr = className.split(' ');
+
+    if (arr.indexOf(str) !== -1) {
+      dom.className = className.replace(str, '').trim();
+    }
+  } else {
     dom.className = className.replace(str, '').trim();
   }
 }

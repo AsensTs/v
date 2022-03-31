@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { navigator } from '@/settings'
+import { navigator } from '@/config'
+import store from '@/store'
 import Layout from '@layout' 
 
 const setNavigator = () => {
@@ -44,6 +45,10 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   console.log(`to: ${to.path}` , `from: ${from.path}`);
+
+  // close search page
+  store.dispatch('search/close_search');
+
   if (to.name == undefined) {
     router.push('/')
   }

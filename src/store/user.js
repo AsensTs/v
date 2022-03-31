@@ -1,9 +1,10 @@
 import { login, login_validate, user_type, user_logout } from '@apis/user.js'
 import { setToken, removeToken } from '@utils/auth';
 import { Toast } from 'vant';
+import { getStorage } from '@utils/localStorage';
 
 const state = {
-  authName: '' || JSON.parse(window.localStorage.getItem('vuex')).user.authName
+  authName: '' || getStorage('user/authName')
 }
 
 const mutations = {
@@ -39,10 +40,12 @@ const actions = {
               commit('LOGIN', username);
               Toast.success("登陆成功！");
               reslove();
-            } else {
-              Toast.fail("登陆失败,用户名或密码错误！");
             }
           })
+        })
+        .catch(error => {
+          Toast.fail("登陆失败,用户名或密码错误！");
+          reject(error)
         })
       }).catch(error => {
         reject(error)

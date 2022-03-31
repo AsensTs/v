@@ -38,3 +38,6 @@ $height-htop-item: 60px;
 $height-header-bottom: 60px;
 $height-footer: 50px;
 $height-main: calc(100% - #{$height-header-top} - #{$height-header-bottom} - #{$height-footer});
+
+// nav
+$activeColor: #13418e;
