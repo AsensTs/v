@@ -3,8 +3,8 @@
     <div class="col">
       <div class="item" v-for="(item, index) in navigator" :key="item.title + index">
         <div v-if="!item.title||item.title=='logo'" class="img"><img :src="item.logo" /></div>
-        <div v-else :class="['icon-item', activeIndex == index ? 'activeColor' : '']" @click="handleNavClick(item.path, index)">
-          <p class="icon"><van-icon :name="activeIndex == index ? (item.activeIcon ? item.activeIcon : item.icon) : item.icon"/></p>
+        <div v-else :class="['icon-item', activeNavIndex == index + 1 ? 'activeColor' : '']" @click="handleNavClick(item.path, index)">
+          <p class="icon"><van-icon :name="activeNavIndex == index + 1 ? (item.activeIcon ? item.activeIcon : item.icon) : item.icon"/></p>
           <p class="title">{{item.title}}</p>
         </div>
       </div>
@@ -13,16 +13,39 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { reactive , ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { navigator } from '@/config'
+import { useStore } from 'vuex'
 
 const router = useRouter();
+const route = useRoute();
+const store = useStore();
 
 const state = reactive({
   navWidth: 0
 })
-const activeIndex = ref(0)
+const activeNavIndex = ref(0);
+activeNavIndex.value = store.getters['common/activeNavIndex'];
+
+watch(
+  () => route.meta.order,
+  (order, oldOrder) => {
+    if (order < oldOrder) { // 右滑
+      activeNavIndex.value = order;
+      setActive(order);
+    } else if (order > oldOrder){ // 左滑
+      activeNavIndex.value = order;
+      setActive(order);
+    } else {
+      return;
+    }
+  },
+  {
+    immediate: true, // 立即执行
+    deep: true // 深度监听
+  }
+)
 
 state.navWidth = (() => {
   let len = navigator.length;
@@ -30,8 +53,13 @@ state.navWidth = (() => {
 })();
 
 const handleNavClick = (path, index) => {
-  activeIndex.value = index;
+  activeNavIndex.value = index;
+  setActive(index)
   router.push(path)
+}
+
+const setActive = (value) => {
+  store.dispatch('common/activeNavIndex', value)
 }
 
 </script>

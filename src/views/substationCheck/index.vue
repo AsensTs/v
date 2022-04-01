@@ -15,14 +15,14 @@
             finished-text="没有更多了"
             @load="onLoad"
           >
-            <van-cell v-for="item in list" :key="item" > 
+            <van-cell v-for="(item, index) in list" :key="item.instId" @click="handleClickItem(item, index)"> 
               <div class="table-item">
                 <div class="item-top"><p>{{item.target}}</p></div>
                 <div class="item-bottom">
                   <div class="item"><van-icon name="location" />{{item.czdw}}</div>
                   <div class="item"><van-icon name="calendar-o" /><span class="time">{{formatDate(item.generateTime)}}</span></div>
-                  <div class="item"><span v-html="formaStatus(item.description)"></span></div>
-                  <div class="item">查看</div>
+                  <div class="item"><van-tag :type="formaStatus(item.description).type">{{formaStatus(item.description).text}}</van-tag></div>
+                  <div class="item check" @click="handleCheck">查看</div>
                 </div>
               </div>
             </van-cell>
@@ -32,32 +32,30 @@
     </div>
     <ScrollTop :max="20" :len="listLen" @scrollTop="scrollTop"></ScrollTop>
     
-    <transition enter-active-class="animate__animated animate__fadeInRight animate__faster" leave-active-class="animate__animated animate__fadeOut">
-      <div class="search-page" v-if="isSearchPage" @click="handleClickSearchPage">
-        <div @click.stop="handleClickSearchCell">
-          <div class="title"><p>搜索变电操作票</p></div>
-          <!-- <SearchPage @handleCloseSearchPage="handleCloseSearchPage"></SearchPage> -->
-          <van-cell-group inset>
-              <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
-              <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
-              <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
-              <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
-              <van-button class="search-btn" type="primary" size="small">搜索</van-button>
-          </van-cell-group>
-        </div>
-      </div>
+    <transition :enter-active-class="animate('fadeInRight animate__faster')" :leave-active-class="animate('fadeOut animate__faster')">
+      <SearchPage v-if="isSearchPage" dispath="search/substationCheck_search">
+        <div class="title"><p>搜索变电操作票</p></div>
+        <van-cell-group inset>
+            <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
+            <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
+            <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
+            <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
+            <van-button class="search-btn" type="primary" size="small">搜索</van-button>
+        </van-cell-group>
+      </SearchPage>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { watch, nextTick, reactive, ref, toRaw, computed} from 'vue';
+import { computed, watch, nextTick, reactive, ref, toRaw } from 'vue';
 import { Toast } from 'vant';
 import { getStationTicket } from '@apis/substationCheck'
+import SearchPage from '@components/search/searchPage'
 import ScrollTop from '@components/scrollTop'
-// import SearchPage from '@components/search/searchPage'
-import { useStore } from 'vuex'
 import filter from '@utils/filter'
+import animate from '@utils/animate'
+import { useStore } from 'vuex';
 
 const refresh_loading = ref(false);
 const list_loading = ref(false);
@@ -67,9 +65,6 @@ const status = ref(4);
 const listLen = ref(0);
 const listRef = ref('listRef');
 const store = useStore();
-const isSearchPage = computed(() => {
-  return  store.getters['search/ssc_search'];
-})
 const state = reactive({
   step: 10,
   params: { status: "已生成", offset: 0, limit: 0, },
@@ -86,6 +81,9 @@ const target = ref('');
 const search = ref('');
 const nprTime = ref('');
 const showCalendar = ref(false);
+const isSearchPage = computed(() => {
+  return  store.getters['search/substationCheck_search'];
+})
 
 // 直接监听 ref
 watch(listLen, (newListLen) => {
@@ -112,11 +110,11 @@ const onRefresh = () => {
 // 格式化状态（status）信息
 const formaStatus = (status) => {
   if (status === "错误") {
-    return `<span style="color:#f74747">${status}</span>`;
+    return { type: 'danger', text: "错误" };
   } else if (status === undefined) {
     return;
   } else {
-    return `<span style="color:#67C23A">${status}</span>`;
+    return { type: 'success', text: "正确" };
   }
 }
 
@@ -144,22 +142,19 @@ const scrollTop = async () => {
   listLen.value = 0;
 }
 
-// Close search page 
-// function handleCloseSearchPage(value) {
-//   console.log(value);
-//   store.dispatch('search/ssc_search', false)
-// }
-
 const onConfirm = (value) => {
   showCalendar.value = false;
   nprTime.value = filter.formaDate(value, 'yyyy-MM-dd');
 }
 
-const handleClickSearchPage = () => {
-  store.dispatch('search/ssc_search', false)
+const handleClickItem = (data, index) => {
+  console.log(data, index);
 }
 
-const handleClickSearchCell = () => {}
+const handleCheck = () => {
+
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -199,7 +194,7 @@ const handleClickSearchCell = () => {}
           font-weight: bold;
           color: #6b6b6b;
           p {
-            width: 80%;
+            width: 95%;
             @include ellipsis();
             font-size: 14px;
           }
@@ -217,12 +212,16 @@ const handleClickSearchCell = () => {}
               padding-left: 2px;
             }
           }
+
+          .check {
+            text-decoration: underline;
+          }
         }
       }
     }
   }
 
-  .search-page {
+  .search {
     .title {
       text-align: center;
       margin: 10px;

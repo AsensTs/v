@@ -1,25 +1,34 @@
 <template>
-  <van-search ref="searchRef"  v-model="searchValue" @search="handleClickSearch" @blur="handleCloseSearchPage"  placeholder="请输入搜索关键词" clearable  shape="round" v-bind="$attrs"/>
+  <div id="search-page" class="search-page"  @click="handleCloseSearchPage" >
+    <div class="search">
+      <div @click.stop="()=>{}"> 
+        <slot></slot>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref, toRaw, defineEmits } from "vue" 
-const searchValue = ref(null);
-const searchRef = ref('searchRef');
-const emit = defineEmits(['handleCloseSearchPage']);
+import { defineProps, onMounted } from 'vue'
+import { useStore } from 'vuex';
+import { removeTouch } from '@utils/touchs'
+const props = defineProps({
+  dispath: {
+    type: String,
+    default: ""
+  }
+})
+const store = useStore();
 
 onMounted(()=>{
-  let dom = toRaw(searchRef.value);
-  dom.focus();
+  removeTouch(document.getElementById('search-page'))
 })
 
-const handleClickSearch = (value) => {
-  console.log(value);
+const handleCloseSearchPage = () => {
+  store.dispatch(props.dispath, false);
 }
 
-const handleCloseSearchPage = () => {
-  emit('handleCloseSearchPage', true);
-}
+
 </script>
 
 <style lang="scss" scoped>

@@ -4,7 +4,7 @@
   </div>
 
   <div v-else class="search-mod" :style={width:formattWidth(width)}>
-    <van-search  @focus="handleOpenSearchPage"  placeholder="请输入搜索关键词" clearable  shape="round" v-bind="$attrs"/>
+    <van-search ref="searchRef" @focus="handleOpenSearchPage"  placeholder="请输入搜索关键词" clearable  shape="round" v-bind="$attrs"/>
   </div>
 </template>
 
@@ -31,9 +31,8 @@ const props = defineProps({
     default: false
   }
 })
-console.log(props);
 
-console.log(route);
+console.log(props);
 
 // Expand the input field
 function handleClickSearchBox() {
@@ -59,14 +58,32 @@ function searchFocus() {
   searchRef.value.focus();
 }
 // Get focus to open the search page
-function handleOpenSearchPage() {
+const handleOpenSearchPage = async () => {
+  // 去掉外层搜索框的焦点
+  searchRef.value.blur();
+  // 添加一个状态（state）, 控制搜索页面的物理返回。
+  history.pushState(null, null, `/#${route.fullPath}/search`); 
+
+  let dispath = '';
   switch (route.fullPath) {
     case '/substationCheck':
-      console.log('/substationCheck');
-      store.dispatch('search/ssc_search', true);
+      dispath = 'search/substationCheck_search';
+      break;
+    case '/permissiongd': 
+      dispath = 'search/permission_search';
+      break;
+    case '/schedulingPar': 
+      dispath = 'search/schedulingPar_search';
+      break;
+    case '/transmissionSecurity': 
+      dispath = 'search/transmissionSecurity_search';
+      break;
+    case '/associatedCheck': 
+      dispath = 'search/associatedCheck_search';
       break;
     default: break;
   }
+  store.dispatch(dispath, true);
 }
 
 // Formatting width

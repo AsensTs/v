@@ -1,7 +1,7 @@
 <template>
   <div class="main" id="main">
     <router-view v-slot="{ Component }">
-    <transition :enter-active-class="enter + 'animate__faster'" :leave-active-class="leave">
+    <transition :enter-active-class="enter" :leave-active-class="leave">
       <keep-alive>
         <component :is="Component" class="component"/>
       </keep-alive>
@@ -12,7 +12,7 @@
 
 <script>
 import animate from '@utils/animate'
-import touch from '@utils/touchs'
+import { touch } from '@utils/touchs'
 export default {
   data() {
     return {
@@ -28,17 +28,17 @@ export default {
   watch: {
     $route (to, from) {
       // 切页面动画
-      let toDepth = to.meta.depth;
-      let fromDepth = from.meta.depth;
-      if (fromDepth > toDepth) {
-        this.enter = animate('fadeIn');
-        this.leave = animate('fadeIn');
-      } else if (fromDepth < toDepth) {
-        this.enter = animate('fadeIn');
-        this.leave = animate('fadeIn');
+      let toOrder = to.meta.order;
+      let fromOrder = from.meta.order;
+      if (fromOrder > toOrder) { // 右滑
+        this.enter = animate('slideInLeft animate__faster');
+        this.leave = animate('slideOutRight animate__faster');
+      } else if (fromOrder < toOrder) { // 左滑
+        this.enter = animate('slideInRight animate__faster');
+        this.leave = animate('slideOutLeft animate__faster');
       } else {
-        this.enter = animate('fadeIn');
-        this.leave = animate('fadeOut');
+        this.enter = animate('fadeIn animate__faster');
+        this.leave = animate('fadeOut animate__faster');
       }
     }
   },
