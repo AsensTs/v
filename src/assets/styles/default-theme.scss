@@ -1,4 +1,6 @@
 @import './variable.scss';
+@import './mixin.scss';
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -36,6 +38,24 @@
   background-color: rgba(255, 255, 255, 0);
 }
 
+.van-step--vertical:not(:last-child):after {
+  border: none;
+}
+
+.van-tag {
+  position: relative;
+  top: -1px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+}
+.subtitle {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 // nav active Color
 .activeColor {
   color: $activeColor;
@@ -46,11 +66,41 @@
 .search-page {
   height: 100%;
   width: 100%;
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: #fff;
+  background-color: $bg-color;
   z-index: 2001;
+  @include fixed();
+}
+
+.details-page {
+  height: 100%;
+  width: 100%;
+  background-color: $bg-color;
+  z-index: 2001;
+  @include fixed();
+  .details-content {
+    .topbar {
+      position: relative;
+      width: 100%;
+      height: $topBar;
+      background: $bg-topBar;
+      .back {
+        position: absolute;
+        width: 30px;
+        height: $topBar;
+        padding: 0 10px;
+        .van-icon {
+          font-size: 18px;
+          line-height: $topBar;
+          color: $text-white;
+        }
+      }
+      .title {
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: $topBar;
+        color: $text-white;
+      }
+    }
+  }
 }

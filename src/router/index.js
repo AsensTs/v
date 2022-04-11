@@ -48,6 +48,7 @@ router.beforeEach((to, from) => {
 
   // close search page
   store.dispatch('search/close_search');
+  store.dispatch('details/close_details');
 
   if (to.name == undefined) {
     router.push('/')

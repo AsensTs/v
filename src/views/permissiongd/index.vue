@@ -2,7 +2,7 @@
   <div class="main-container">
     <div class="table">
       <div class="table-title">
-        <div class="title">厂站许可校核</div>
+        <div class="title">{{title}}</div>
         <van-dropdown-menu active-color="#1989fa">
           <van-dropdown-item v-model="state" :options="stateOptions" @change="handleChange"/>
         </van-dropdown-menu>
@@ -19,8 +19,8 @@
               <div class="table-item">
                 <div class="item-bottom">
                   <div class="item">申请单位：{{item.sqdw}}</div>
-                  <div class="item">申请日期：<span class="time">{{formaDate(item.sqrq, "yyyy-MM-dd hh-mm-ss")}}</span></div>
-                  <div class="item czrw"><p>操作任务：{{item.czrw}}</p></div>
+                  <div class="item">申请日期：<span class="time">{{formaDate(item.sqrq, "yyyy-MM-dd hh:mm:ss")}}</span></div>
+                  <div class="item"><p>操作任务：{{item.czrw}}</p></div>
                   <div class="item">许可来源：{{item.xklx}}</div>
                   <div class="item">填写人：{{item.txr}}</div>
                   <div class="item">结果：<van-tag :type="formaResult(item.checkResult).type">{{formaResult(item.checkResult).text}}</van-tag></div>
@@ -35,7 +35,7 @@
     
     <transition enter-active-class="animate__animated animate__fadeInRight animate__faster" leave-active-class="animate__animated animate__fadeOut">
       <SearchPage v-if="isSearchPage" dispath="search/permission_search">
-        <div class="title"><p>厂站许可校核</p></div>
+        <div class="title"><p>{{title}}</p></div>
         <van-cell-group inset>
           <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
           <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
@@ -57,6 +57,7 @@ import ScrollTop from '@components/scrollTop'
 import { useStore } from 'vuex'
 import filter from '@utils/filter'
 
+const title = '厂站许可校核';
 const refresh_loading = ref(false);
 const list_loading = ref(false);
 const list = ref([]);
@@ -69,8 +70,8 @@ const isSearchPage = computed(() => {
   return store.getters['search/permission_search'];
 })
 const states = reactive({
-  step: 10,
-  params: { state: 1, offset: 0, limit: 0, },
+  step: 0,
+  params: { state: 1, offset: 0, limit: 10, },
   limit: 0
 })
 const stateOptions = [
@@ -89,13 +90,22 @@ watch(listLen, (newListLen) => {
 })
 
 // 加载数据
-const onLoad = async () => {
-  states.params.limit += states.step;
-  states.params.offset = states.params.limit - states.step;
-  listLen.value = states.params.limit;
-  let res = await getPermissiongd(states.params);
-  list.value = res.data;
-  list_loading.value = false;
+const onLoad = () => {
+  states.step += 10;
+  states.params.offset = states.step - 10;
+  listLen.value = states.step;
+  getPermissiongd(states.params).then(res => {
+    if (res.code === 200) {
+      list.value = [...list.value, ...res.data];
+      list_loading.value = false;
+      
+      if (res.data.length < 10) {
+        finished.value = true;
+      }
+    }
+  }).catch((error) => {
+    console.error(error);
+  })
 }
 
 const onRefresh = () => {
@@ -107,7 +117,12 @@ const onRefresh = () => {
 
 // 选择状态(status)
 const handleChange = async (value) => {
-  states.params = {state: value, offset: 0, limit: 0};
+  finished.value = false;
+  list_loading.value = true;
+  list.value = [];
+  states.step = 0;
+  states.params.state = value;
+  states.params.offset = 0;
   await nextTick();
   let dom = toRaw(listRef.value);
   dom.scrollTop = 0;
@@ -149,9 +164,7 @@ const formaResult = (result) => {
       box-shadow: 0 0 10px #eee;
       background: $bg-color;
       .title {
-        font-size: 14px;
         color: #797979;
-        font-weight: bold;
       }
     }
     .table-container {

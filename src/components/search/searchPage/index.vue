@@ -12,6 +12,7 @@
 import { defineProps, onMounted } from 'vue'
 import { useStore } from 'vuex';
 import { removeTouch } from '@utils/touchs'
+import { useRoute } from 'vue-router';
 const props = defineProps({
   dispath: {
     type: String,
@@ -19,6 +20,7 @@ const props = defineProps({
   }
 })
 const store = useStore();
+const route = useRoute();
 
 onMounted(()=>{
   removeTouch(document.getElementById('search-page'))
@@ -26,6 +28,7 @@ onMounted(()=>{
 
 const handleCloseSearchPage = () => {
   store.dispatch(props.dispath, false);
+  history.pushState(null, null, `/#${route.fullPath}`); 
 }
 
 

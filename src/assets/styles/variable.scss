@@ -11,8 +11,8 @@ $danger: #f74747;
 $danger-hover: #fc7171;
 
 // text-color
-$text-white: #eee;
-$text-white-hover: #ffffff;
+$text-white: #fff;
+$text-white-hover: #eee;
 $text-black: #333333;
 $text-black-hover: #000000;
 $text-primary: #f7f8fa;
@@ -41,3 +41,7 @@ $height-main: calc(100% - #{$height-header-top} - #{$height-header-bottom} - #{$
 
 // nav
 $activeColor: #13418e;
+
+// details
+$bg-topBar:#13418e; 
+$topBar: 40px;
