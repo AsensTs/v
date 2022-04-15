@@ -1,6 +1,6 @@
 const state = {
   substationCheck_details: false,    // subStationCheck
-  permission_details: false,
+  permissiongd_details: false,
   schedulingPar_details: false,
   transmissionSecurity_details: false,
   associatedCheck_details: false
@@ -10,8 +10,8 @@ const mutations = {
   'SUBSTATIONCHECK_DETAILS':(state, value) => {
     state.substationCheck_details = value
   },
-  'PERMISSION_DETAILS':(state, value) => {
-    state.permission_details = value
+  'PERMISSIONGD_DETAILS':(state, value) => {
+    state.permissiongd_details = value
   },
   'SCHEDULING_PAR_DETAILS':(state, value) => {
     state.schedulingPar_details = value
@@ -28,7 +28,7 @@ const mutations = {
         case 'substationCheck_details': 
           state.substationCheck_details = false;
           break;
-        case 'permission_details': 
+        case 'permissiongd_details': 
           state.permission_details = false;  
           break;
         case 'schedulingPar_details': 
@@ -55,8 +55,8 @@ const actions = {
   substationCheck_details({ commit }, value) {
     commit('SUBSTATIONCHECK_DETAILS', value);
   },
-  permission_details({ commit }, value) {
-    commit('PERMISSION_DETAILS', value);
+  permissiongd_details({ commit }, value) {
+    commit('PERMISSIONGD_DETAILS', value);
   },
   schedulingPar_details({ commit }, value) {
     commit('SCHEDULING_PAR_DETAILS', value);
@@ -76,8 +76,8 @@ const getters = {
   substationCheck_details: (state) => {
     return state.substationCheck_details;
   },
-  permission_details: (state) => {
-    return state.permission_details;
+  permissiongd_details: (state) => {
+    return state.permissiongd_details;
   },
   schedulingPar_details: (state) => {
     return state.schedulingPar_details;

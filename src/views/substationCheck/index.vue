@@ -48,6 +48,10 @@
     <transition :enter-active-class="animate('fadeInRight animate__faster')" :leave-active-class="animate('fadeOut animate__faster')">
       <DetailsPage v-if="isDetailsPage" :title="'变电操作票'">
         <div class="details">
+          <div class="checkResultImg">
+            <img v-if="details.keyCount > 0 || details.operationCount > 0 || details.stateCount > 0 " class="seal" src="@assets/images/false.png" alt />
+            <img v-else class="seal" src="@assets/images/true.png" alt/>
+          </div>
           <div class="basic-info">
             <div class="subtitle">{{ details.czdw }}</div>
             <van-row gutter="5"><van-col class="d_label" :span="d_label">票号：</van-col> <van-col class="d_value" :span="d_value">{{ details.number }}</van-col></van-row>
@@ -120,10 +124,11 @@ import { getStationTicket, getSTCheckResult, substationAgainTicketCheck, ticketS
 import SearchPage from '@components/search/searchPage'
 import ScrollTop from '@components/scrollTop'
 import DetailsPage from '@components/details'
-import filter from '@utils/filter'
 import animate from '@utils/animate'
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
+import pushState from '@/utils/pushState'
+import filter from '@utils/filter'
 
 const store = useStore();
 const route = useRoute();
@@ -239,7 +244,7 @@ const handleItemCheck = (data) => {
   steps_loading.value = true;
   store.dispatch('details/substationCheck_details', true);
   details.value = data;
-  history.pushState(null, null, `/#${route.fullPath}/details`);
+  pushState(route.fullPath);
   getTicketResult(data.inst_id);
 }
 
@@ -592,6 +597,7 @@ function getResultTagType(ticket) {
     height: calc(100vh - 45px);
     padding: 10px;
     overflow-y: auto;
+    position: relative;
     .basic-info {
       font-size: 13px;
       border: 1px solid #eee;
@@ -615,6 +621,16 @@ function getResultTagType(ticket) {
         .d_value {
           color: #888888;
         }
+      }
+    }
+    .checkResultImg {
+      position: absolute;
+      width: 20%;
+      right: 10px;
+      top: 30px;
+      img {
+        width: 100%;
+        transform: rotate(45deg);
       }
     }
 

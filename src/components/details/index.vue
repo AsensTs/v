@@ -5,7 +5,9 @@
         <div class="back" @click="handleCloseDetailsPage"><van-icon name="arrow-left" /></div>
         <div class="title">{{title}}</div>
       </div>
-      <slot></slot>
+      <div class="content">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
