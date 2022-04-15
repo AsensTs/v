@@ -2,7 +2,7 @@ import { getStorage } from '@utils/localStorage';
 
 const state = {
   appTitle: '' || getStorage("common/appTitle"),
-  activeNavIndex: 1
+  activeNavIndex: '' || getStorage("common/activeNavIndex")
 }
 
 const mutations = {

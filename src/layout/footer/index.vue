@@ -32,9 +32,11 @@ watch(
   () => route.meta.order,
   (order, oldOrder) => {
     if (order < oldOrder) { // 右滑
+      console.log(order);
       activeNavIndex.value = order;
       setActive(order);
     } else if (order > oldOrder){ // 左滑
+      console.log(order);
       activeNavIndex.value = order;
       setActive(order);
     } else {

@@ -87,10 +87,14 @@ const onLoad = () => {
   states.step += 10;
   states.params.offset = states.step - 10;
   listLen.value = states.step;
-  associatedOPerTicket(states.params).then(res => {
+  getData(states.params);
+  list_loading.value = false;
+}
+
+const getData = (params) => {
+  associatedOPerTicket(params).then(res => {
     if (res.code === 200) {
       list.value = [...list.value, ...res.data];
-      list_loading.value = false;
       
       if (res.data.length < 10) {
         finished.value = true;
@@ -101,10 +105,13 @@ const onLoad = () => {
   })
 }
 
+// 下拉刷新
 const onRefresh = () => {
   setTimeout(() => {
     Toast('刷新成功');
     refresh_loading.value = false;
+    states.params =  { status: status, offset: 0, limit: 10 };
+    getData(states.params);
   }, 1000);
 };
 

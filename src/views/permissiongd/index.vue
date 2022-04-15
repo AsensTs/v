@@ -80,9 +80,9 @@
                 <span v-if="JSON.parse(detailsInfo.sfmzkgtj)" style="color:#5e9aff">满足开工条件，申请开工</span>
                 <span v-else>未满足开工条件</span>
               </van-cell>
-              <van-cell title="工作内容" :value="detailsInfo.gznr" class="custom" />
-              <van-cell title="操作任务" :value="detailsInfo.czrw" class="custom" />
-              <van-cell title="备注" :value="detailsInfo.bz" class="custom" />
+              <van-cell title="工作内容" :value="detailsInfo.gznr" class="van-cell-custom" />
+              <van-cell title="操作任务" :value="detailsInfo.czrw" class="van-cell-custom" />
+              <van-cell title="备注" :value="detailsInfo.bz" class="van-cell-custom" />
               <van-cell title="填写人(申请人)" :value="detailsInfo.txr"/>
             </van-cell-group>
           </div>
@@ -177,10 +177,14 @@ const onLoad = () => {
   states.step += 10;
   states.params.offset = states.step - 10;
   listLen.value = states.step;
-  getPermissiongd(states.params).then(res => {
+  getData(states.params);
+  list_loading.value = false;
+}
+
+const getData = (params) => {
+  getPermissiongd(params).then(res => {
     if (res.code === 200) {
       list.value = [...list.value, ...res.data];
-      list_loading.value = false;
       
       if (res.data.length < 10) {
         finished.value = true;
@@ -191,10 +195,13 @@ const onLoad = () => {
   })
 }
 
+// 下拉刷新
 const onRefresh = () => {
   setTimeout(() => {
     Toast('刷新成功');
     refresh_loading.value = false;
+    states.params =  { state: state, offset: 0, limit: 10 };
+    getData(states.params);
   }, 1000);
 };
 
@@ -290,7 +297,7 @@ const handleClick = (data) => {
       }
     });
   }).catch(error => {
-    console.log(error);
+    console.error(error);
   })
 }
 </script>
@@ -347,11 +354,7 @@ const handleClick = (data) => {
 
   .search-page {
     .title {
-      text-align: center;
-      margin: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #737373;
+      @include title($margin: 10px, $font-size: 16px, $color: #737373);
     }
     .cell-item {
       padding: 5px 8px;
@@ -390,16 +393,6 @@ const handleClick = (data) => {
         padding: 6px 0;
       }
     }
-    .checkResultImg {
-      position: absolute;
-      width: 20%;
-      right: 10px;
-      top: 30px;
-      img {
-        width: 100%;
-        transform: rotate(45deg);
-      }
-    }
     .detailsInfo {
       ::v-deep .van-cell-group {
         margin: 0 10px;
@@ -420,9 +413,7 @@ const handleClick = (data) => {
       box-sizing: border-box;
       box-shadow: 0 0 10px #e9e9e9;
       h3 {
-        text-align: center;
-        padding-top: 10px;
-        font-weight: bold;
+        @include title($padding: 10px 0 0 0);
       }
       .list {
         border: 1px solid #eee;

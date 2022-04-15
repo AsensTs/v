@@ -13,14 +13,14 @@
             @load="onLoad"
           >
             <van-cell v-for="item in list" :key="item" > 
-              <div class="table-item">
+              <div class="table-item" @click="handleClickItem(item)">
                 <div class="item-top"><p>{{item.czmd}}</p></div>
                 <div class="item-bottom">
                   <div class="item">拟票人：{{item.nlr}}</div>
                   <div class="item"><span class="time">{{formaDate(item.nprTime, "yyyy-MM-dd hh:mm:ss")}}</span></div>
                   <!-- <div class="item czrw">工作任务：{{item.czmd}}</div> -->
                   <div class="item"><van-tag :type="formaResult(item.description).type">{{formaResult(item.description).text}}</van-tag></div>
-                  <div class="item check">详情</div>
+                  <div class="item check" @click="handleClickItem(item)">详情</div>
                 </div>
               </div>
             </van-cell>
@@ -42,17 +42,48 @@
         </van-cell-group>
       </SearchPage>
     </transition>
+   
+    <transition :enter-active-class="animate('fadeInRight animate__faster')" :leave-active-class="animate('fadeOut animate__faster')">
+      <DetailsPage v-if="isDetailsPage" :title="title">
+        <div class="basic-info">
+            <div class="checkResultImg">
+            <img v-if="ticketDetails.description === '正确'" class="seal" src="@assets/images/true.png" alt />
+            <img v-else class="seal" src="@assets/images/false.png" alt/>
+          </div>
+          <h3>基础信息</h3>
+          <van-cell-group inset>
+            <van-cell title="拟票人" :value="ticketDetails.nlr" />
+            <van-cell title="拟票时间" :value="formaDate(ticketDetails.nprTime, 'yyyy-MM-dd hh:mm:ss')" />
+            <van-cell title="工作任务" :value="ticketDetails.czmd" class="van-cell-custom"/>
+          </van-cell-group>
+        </div>
+        <div class="oper-step">
+          <ts-table v-model="tableData" title="校核结果">
+            <ts-table-item label="序号" prop="type" width="60"></ts-table-item>
+            <ts-table-item label="合序" prop="result" width="60"></ts-table-item>
+            <ts-table-item label="操作单位" prop="result" width="100"></ts-table-item>
+            <ts-table-item label="操作内容" prop="content"></ts-table-item>
+            </ts-table>
+        </div>
+      </DetailsPage>
+    </transition>
   </div>
 </template>
 
 <script setup>
 import { watch, nextTick, reactive, ref, toRaw, computed} from 'vue';
 import { Toast } from 'vant';
-import { predictateTicket } from '@apis/schedulingPar'
+import { useStore } from 'vuex'
+import { predictateTicket, predictateTicketDetails } from '@apis/schedulingPar'
 import SearchPage from '@components/search/searchPage'
 import ScrollTop from '@components/scrollTop'
-import { useStore } from 'vuex'
+import DetailsPage from '@components/details'
+import tsTable from '@components/table/ts-table'
+import tsTableItem from '@components/table/ts-table-item'
 import filter from '@utils/filter'
+import animate from '@utils/animate'
+import pushState from '@/utils/pushState'
+import { useRoute } from 'vue-router';
 
 const title = '调度操作票校核';
 const refresh_loading = ref(false);
@@ -62,18 +93,23 @@ const finished = ref(false);
 const listLen = ref(0);
 const listRef = ref('listRef');
 const store = useStore();
+const route = useRoute();
 const isSearchPage = computed(() => {
-  return store.getters['search/permission_search'];
+  return store.getters['search/schedulingPar_search'];
+})
+const isDetailsPage = computed(() => {
+  return store.getters['details/schedulingPar_details'];
 })
 const states = reactive({
   step: 0,
-  params: { state: 1, offset: 0, limit: 10, },
+  params: { offset: 0, limit: 10, },
   limit: 0
 })
 const description = ref('');
 const czmd = ref('');
 const nprTime = ref('');
 const showCalendar = ref(false);
+const ticketDetails = ref(null); // details data
 const formaDate = filter.formaDate;
 
 // 直接监听 ref
@@ -86,26 +122,23 @@ const onLoad = async () => {
   states.step += 10;
   states.params.offset = states.step - 10;
   listLen.value = states.step;
-  let res = await predictateTicket(states.params);
-  list.value = [...list.value, ...res.data];
+  getData(states.params)
   list_loading.value = false;
+}
+
+const getData = async (params) => {
+  let res = await predictateTicket(params);
+  list.value = [...list.value, ...res.data];
 }
 
 const onRefresh = () => {
   setTimeout(() => {
     Toast('刷新成功');
     refresh_loading.value = false;
+    states.params =  {offset: 0, limit: 10 };
+    getData(states.params);
   }, 1000);
 };
-
-// 选择状态(status)
-// const handleChange = async (value) => {
-//   states.params = {state: value, offset: 0, limit: 0};
-//   await nextTick();
-//   let dom = toRaw(listRef.value);
-//   dom.scrollTop = 0;
-//   onLoad();
-// }
 
 // 返回顶部
 const scrollTop = async () => {
@@ -127,6 +160,23 @@ const formaResult = (result) => {
   return { type: 'danger', text: "错误" };
 }
 
+const handleClickItem = (data) => {
+  store.dispatch('details/schedulingPar_details', true);
+  pushState(route.fullPath);
+  getDetails(data.instId);
+}
+
+const getDetails = (instId) => {
+  predictateTicketDetails(instId).then(res => {
+    if (!res === 200) {
+      console.error(res.code, res);
+    }
+    const { ticket } = res.data;
+    ticketDetails.value = ticket;
+  }).catch(error => {
+    console.error(error);
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -192,7 +242,6 @@ const formaResult = (result) => {
       }
     }
   }
-
   .search-page {
     .title {
       text-align: center;
@@ -223,7 +272,27 @@ const formaResult = (result) => {
       padding: 0 16px;
     }
   }
+  .details-page {
+    background: #f9fbff;
+    .basic-info {
+      position: relative;
+      background: #fff;
+      margin: 10px;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      box-shadow: 0 0 10px #e9e9e9;
+      .checkResultImg {
+        right: 20px;
+        top: 15px;
+        img {
+          transform: rotate(20deg);
+        }
+      }
+      h3 {
+        @include title();
+      }
+    }
+  }
 }
-
-
 </style>

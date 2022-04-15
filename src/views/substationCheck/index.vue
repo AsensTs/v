@@ -181,10 +181,14 @@ const onLoad = () => {
   state.step += 10;
   state.params.offset = state.step - 10;
   listLen.value = state.step;
-  getStationTicket(state.params).then(res => {
+  getData(state.params);
+  list_loading.value = false;
+}
+
+const getData = (params) => {
+  getStationTicket(params).then(res => {
     if (res.code === 200) {
       list.value = [...list.value, ...res.data];
-      list_loading.value = false;
       
       if (res.data.length < 10) {
         finished.value = true;
@@ -195,10 +199,13 @@ const onLoad = () => {
   })
 }
 
+// 下拉刷新
 const onRefresh = () => {
   setTimeout(() => {
     Toast('刷新成功');
     refresh_loading.value = false;
+    state.params =  { status: status, offset: 0, limit: 10 };
+    getData(state.params);
   }, 1000);
 };
 
@@ -247,7 +254,6 @@ const handleItemCheck = (data) => {
   pushState(route.fullPath);
   getTicketResult(data.inst_id);
 }
-
 
 const getTicketResult = async (id) => {
   let res = await getSTCheckResult(id);
@@ -447,6 +453,7 @@ const restTicket = (id) => {
   ticketList.value = null; // 清空数据等待再次获取
   getTicketResult(id);
 }
+
 const checkType = computed(()=>{
   return ticketList.value.checkType
 })
@@ -623,17 +630,6 @@ function getResultTagType(ticket) {
         }
       }
     }
-    .checkResultImg {
-      position: absolute;
-      width: 20%;
-      right: 10px;
-      top: 30px;
-      img {
-        width: 100%;
-        transform: rotate(45deg);
-      }
-    }
-
     .oper-content {
       margin-top: 10px;
       .subtitle{

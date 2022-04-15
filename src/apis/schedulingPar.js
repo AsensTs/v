@@ -12,3 +12,10 @@ export function predictateTicket(params) {
     params: params
   })
 }
+
+export function predictateTicketDetails (instId) {
+  return axios({
+    url: '/api/predictate/details/' + instId,
+    method: 'GET'
+  })
+}
