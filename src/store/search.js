@@ -1,7 +1,7 @@
 
 const state = {
   substationCheck_search: false,    // subStationCheck
-  permission_search: false,
+  permissiongd_search: false,
   schedulingPar_search: false,
   transmissionSecurity_search: false,
   associatedCheck_search: false
@@ -11,8 +11,8 @@ const mutations = {
   'SUBSTATIONCHECK_SEARCH':(state, value) => {
     state.substationCheck_search = value
   },
-  'PERMISSION_SEARCH':(state, value) => {
-    state.permission_search = value
+  'PERMISSIONGD_SEARCH':(state, value) => {
+    state.permissiongd_search = value
   },
   'SCHEDULING_PAR_SEARCH':(state, value) => {
     state.schedulingPar_search = value
@@ -34,8 +34,8 @@ const actions = {
   substationCheck_search({ commit }, value) {
     commit('SUBSTATIONCHECK_SEARCH', value);
   },
-  permission_search({ commit }, value) {
-    commit('PERMISSION_SEARCH', value);
+  permissiongd_search({ commit }, value) {
+    commit('PERMISSIONGD_SEARCH', value);
   },
   schedulingPar_search({ commit }, value) {
     commit('SCHEDULING_PAR_SEARCH', value);
@@ -55,8 +55,8 @@ const getters = {
   substationCheck_search: (state) => {
     return state.substationCheck_search;
   },
-  permission_search: (state) => {
-    return state.permission_search;
+  permissiongd_search: (state) => {
+    return state.permissiongd_search;
   },
   schedulingPar_search: (state) => {
     return state.schedulingPar_search;

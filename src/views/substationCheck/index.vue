@@ -32,18 +32,67 @@
     </div>
     <ScrollTop :max="20" :len="listLen" @scrollTop="scrollTop"></ScrollTop>
     
-    <transition :enter-active-class="animate('fadeInRight animate__faster')" :leave-active-class="animate('fadeOut animate__faster')">
-      <SearchPage v-if="isSearchPage" dispath="search/substationCheck_search">
+    <!-- <van-popup class="search" v-model:show="isSearchPage" @close="handleCloseSearchPage" position="right" closeable :style="{ height: '100%', width: '100%' }">
+      <div class="search-input">
+          <div class="title"><p>搜索变电操作票</p></div>
+          <van-cell-group inset>
+              <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round" @search="onSearch"/>
+              <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round" @search="onSearch"/>
+              <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="show = true" /></div>
+              <ts-calendar v-model:show="show" title="选择日期" :show-confirm="false" @confirm="onSearch"></ts-calendar>
+              <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">共搜索到 {{searchData.length}} 条数据</p>
+          </van-cell-group>
+        </div>
+        <div class="search-result">
+          <van-list>
+            <van-cell v-for="(item, index) in searchData" :key="item.instId + '-' + index" @click="handleItemCheck(item)"> 
+              <div class="table-item">
+                <div class="item-top"><p>{{item.target}}</p></div>
+                <div class="item-bottom">
+                  <div class="item"><van-icon name="location" />{{item.czdw}}</div>
+                  <div class="item"><van-icon name="calendar-o" /><span class="time">{{formatDate(item.time)}}</span></div>
+                  <div class="item"><van-tag :type="getResultTagType(item)">{{getResultTagType(item)=='success'?'正确':'错误'}}</van-tag></div>
+                  <div class="item check" @click.stop="handleItemCheck(item)">查看</div>
+                </div>
+              </div>
+            </van-cell>
+          </van-list>
+        </div>
+    </van-popup> -->
+    <SearchPage dispath="substationCheck_search">
+      <div class="search-input">
         <div class="title"><p>搜索变电操作票</p></div>
         <van-cell-group inset>
-            <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
-            <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
-            <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
-            <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
-            <van-button class="search-btn" type="primary" size="small">搜索</van-button>
+            <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round" @search="onSearch"/>
+            <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round" @search="onSearch"/>
+            <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="show = true" /></div>
+            <ts-calendar v-model:show="show" title="选择日期" :show-confirm="false" @confirm="onSearch"></ts-calendar>
+            <div class="van-popover">
+              <van-popover v-model:show="showStatusPopover" :actions="statusPopOptions" @select="onSelectState" style="margin: 10px;">
+                <template #reference>
+                  <van-button size="mini">{{statusPopOptions[statusPop].text}}<van-icon name="arrow-down" /></van-button>
+                </template>
+              </van-popover>
+            </div>
+            <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">共搜索到 {{searchData.length >= 99?'99+':searchData.length}} 条数据</p>
         </van-cell-group>
-      </SearchPage>
-    </transition>
+      </div>
+      <div class="search-result">
+        <van-list>
+          <van-cell v-for="(item, index) in searchData" :key="item.instId + '-' + index" @click="handleItemCheck(item)"> 
+            <div class="table-item">
+              <div class="item-top"><p>{{item.target}}</p></div>
+              <div class="item-bottom">
+                <div class="item"><van-icon name="location" />{{item.czdw}}</div>
+                <div class="item"><van-icon name="calendar-o" /><span class="time">{{formatDate(item.time)}}</span></div>
+                <div class="item"><van-tag :type="getResultTagType(item)">{{getResultTagType(item)=='success'?'正确':'错误'}}</van-tag></div>
+                <div class="item check" @click.stop="handleItemCheck(item)">查看</div>
+              </div>
+            </div>
+          </van-cell>
+        </van-list>
+      </div>
+    </SearchPage>
 
     <transition :enter-active-class="animate('fadeInRight animate__faster')" :leave-active-class="animate('fadeOut animate__faster')">
       <DetailsPage v-if="isDetailsPage" :title="'变电操作票'">
@@ -76,11 +125,6 @@
                 <van-step v-for="item in tableList" :key="item.inst_id">
                   <h3 :class="[item.type=='error'?'red':'']">{{ item.cznr }}</h3>
                   <div class="result">
-                    <!-- <div class="resultAll">
-                      <span :style="{color: isCheck(item, 'result')?'#67C23A':'#f74747'}">总结果: </span>
-                      <van-icon name="success" color="#67C23A" v-if="checkType && isCheck(item, 'result')" />
-                      <van-icon name="cross" color="#f74747" v-else/>
-                    </div> -->
                     <div class="resultCheck" v-if="isCheck(item)">
                       <p>
                         <span :style="{color: isCheck(item, 'result')?'#67C23A':'#f74747'}">总结果: </span>
@@ -124,6 +168,7 @@ import { getStationTicket, getSTCheckResult, substationAgainTicketCheck, ticketS
 import SearchPage from '@components/search/searchPage'
 import ScrollTop from '@components/scrollTop'
 import DetailsPage from '@components/details'
+import TsCalendar from '@components/calendar'
 import animate from '@utils/animate'
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
@@ -141,7 +186,8 @@ const state = reactive({
 const title = '变电操作票校核';
 const refresh_loading = ref(false);  // 下拉刷新 loading
 const list_loading = ref(false);     // 列表加载 loading
-const showCalendar = ref(false);     // 显示日历
+// const showCalendar = ref(true);     // 显示日历
+const show = ref(false);     // 显示日历
 const steps_loading = ref(true);
 const finished = ref(false);         // ....
 const list = ref([]);     // 数据列表
@@ -153,9 +199,18 @@ const status = ref(4);    // 状态
 const target = ref('');   // 操作任务（搜索参数）
 const search = ref('');   // 站点（搜索参数）
 const nprTime = ref('');  // 时间（搜索参数）
+const searchData = ref(null);
 const ticketList = ref(null);
 const listRef = ref('listRef'); // ref
-
+const statusPop = ref(4);
+const showStatusPopover = ref(false);
+const statusPopOptions = [
+  { text: '错误集', value: 0 },
+  { text: '未校验', value: 1 },
+  { text: '未审核', value: 2 },
+  { text: '已初审', value: 3 },
+  { text: '已生成', value: 4 },
+];
 const statusOptions = [
   { text: '错误集', value: 0 },
   { text: '未校验', value: 1 },
@@ -164,20 +219,35 @@ const statusOptions = [
   { text: '已生成', value: 4 },
 ];
 
-const isSearchPage = computed(() => {
+const isSearchPage = computed(() => {  // search-page
   return  store.getters['search/substationCheck_search'];
 })
-const isDetailsPage = computed(() => {
+
+const isDetailsPage = computed(() => {  // details-page
   return store.getters['details/substationCheck_details'];
 })
 
-// 直接监听 ref
+const checkType = computed(()=>{
+  return ticketList.value.checkType
+})
+
 watch(listLen, (newListLen) => {
   listLen.value = newListLen;
 })
 
-// 加载数据
-const onLoad = () => {
+watch(isSearchPage, (value) => { // 打开搜索页前，初始化数据
+  console.log(value ? '打开搜索页' : '关闭搜索页');
+  initSearch();
+})
+
+const initSearch = () => { // 初始化数据
+  searchData.value = null;
+  target.value = '';
+  search.value = '';
+  nprTime.value = '';
+}
+
+const onLoad = () => { // 加载数据
   state.step += 10;
   state.params.offset = state.step - 10;
   listLen.value = state.step;
@@ -185,42 +255,51 @@ const onLoad = () => {
   list_loading.value = false;
 }
 
-const getData = (params) => {
+const getData = (params, type) => { // 获取数据
   getStationTicket(params).then(res => {
     if (res.code === 200) {
+      // 搜索请求的数据
+      if (type === 'search') {
+        searchData.value = res.data;
+        return;
+      }
+
       list.value = [...list.value, ...res.data];
-      
       if (res.data.length < 10) {
+        // 若数据已全部加载完毕，直接将 finished 设置成 true
         finished.value = true;
       }
+    } else {
+      console.error(res.code, res.msg);
+      Toast.fail("获取数据失败");
+      return;
     }
   }).catch((error) => {
     console.error(error);
   })
 }
 
-// 下拉刷新
-const onRefresh = () => {
+const onRefresh = () => { // 下拉刷新
   setTimeout(() => {
-    Toast('刷新成功');
     refresh_loading.value = false;
     state.params =  { status: status, offset: 0, limit: 10 };
     getData(state.params);
+    Toast('刷新成功');
   }, 1000);
-};
+}
 
-// 格式化日期
-const formatDate = (time) => {
-  if (time.indexOf(' ') !== -1) {
-    let arr = time.split(' ');
-    return arr[0];
-  } else {
-    return time;
+const formatDate = (time) => { // 格式化日期
+  if (time) {
+    if (time.indexOf(' ') !== -1) {
+      let arr = time.split(' ');
+      return arr[0];
+    } else {
+      return time;
+    }
   }
 }
 
-// 选择状态(status)
-const handleChange = async (value) => {
+const handleChange = async (value) => { // 选择状态(status)
   finished.value = false;
   list_loading.value = true;
   list.value = [];
@@ -234,24 +313,40 @@ const handleChange = async (value) => {
   onLoad();
 }
 
-// 返回顶部
-const scrollTop = async () => {
+const scrollTop = async () => { // 返回顶部
   await nextTick();
   let dom = toRaw(listRef.value);
   dom.scrollTop = 0;
   listLen.value = 0;
 }
 
-const onConfirm = (value) => {
-  showCalendar.value = false;
-  nprTime.value = filter.formaDate(value, 'yyyy-MM-dd');
+const onSearch = (value) => { // 搜索数据
+  if (value instanceof Date) {
+    nprTime.value = filter.formaDate(value, 'yyyy-MM-dd');
+    if (show.value) show.value = false;     // 关闭日历
+  }
+
+  Toast.loading({
+    message: '搜索中...',
+    forbidClick: true,
+  });
+
+  let params = {
+    status: state.params.status,
+    target: target.value,
+    search: search.value,
+    nprTime: nprTime.value
+  }
+  console.log(params);
+  getData(params, 'search');
+  list_loading.value = false;
 }
 
 const handleItemCheck = (data) => {
   steps_loading.value = true;
   store.dispatch('details/substationCheck_details', true);
   details.value = data;
-  pushState(route.fullPath);
+  pushState(route.fullPath + '/details');
   getTicketResult(data.inst_id);
 }
 
@@ -262,11 +357,67 @@ const getTicketResult = async (id) => {
     steps_loading.value = false;
   }
 }
+
 const tableList = computed(() => {
   let validations = ticketList.value ? ticketList.value.validations : [];
   let orders = ticketList.value !== null ? ticketList.value.orders : [];
   return orderData(validations, orders);
 })
+
+const restTicket = (id) => {
+  steps_loading.value = true;
+  ticketList.value = null; // 清空数据等待再次获取
+  getTicketResult(id);
+}
+
+const isCheck = (data, key, type) => {
+  if (data && !key && !type) {
+    if (data.parCheck === 'no' || data.stationCheck === 'no' || data.operaCheck === 'no') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  if (data && key === 'result') {
+    if (data.parCheck === 'no' || data.stationCheck === 'no' || data.operaCheck === 'no') {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  if (type === 'yes') {
+    return data[key] && data[key] === 'yes'
+  } else if (type === 'no') {
+    return data[key] && data[key] === 'no'
+  } else {
+    return;
+  }
+}
+
+const isCheckColor = (data, key) => {
+  if (data && key) {
+    if (data[key] === 'yes') {
+      return '#67C23A'
+    } else if (data[key] === 'no') {
+      return '#f74747'
+    } else {
+      return '';
+    }
+  }
+}
+
+function getResultTagType(ticket) {
+  if (!ticket.description) {
+    return "";
+  } else if (ticket.keyCount > 0 || ticket.operationCount > 0 || ticket.stateCount > 0) {
+    return "danger";
+  } else {
+    return "success";
+  }
+}
+
 function orderData(validations, orderList) {
   // 各条操作指令打勾还是打叉
   var orderResults = {}; // orderId: {parCheck: y/n, stationCheck: y/n, operaCheck: y/n}
@@ -384,6 +535,7 @@ function orderData(validations, orderList) {
   });
   return listData;
 }
+
 function judgeBeginField(type) {
   let beginField = "";
 
@@ -406,6 +558,7 @@ function judgeBeginField(type) {
   }
   return beginField;
 }
+
 function getPosByOrderId(orderList, orderId) {
   if (orderId == null) return -1;
   for (var i = 0, len = orderList.length; i < len; i++) {
@@ -415,95 +568,100 @@ function getPosByOrderId(orderList, orderId) {
   }
   return -1;
 }
-//重新票面校核
-function getStationTicketCheckResult(id) {
+
+function getStationTicketCheckResult(id) { //重新票面校核
   substationAgainTicketCheck(id).then(res => {
     if (res.code === 200) {
       restTicket(id);
+    } else {
+      console.error(res.code, res.msg);
+      Toast.fail("票面校核失败");
+      return;
     }
   }).catch(error => {
     console.error(error);
   })
 }
 
-//状态校验
-function getStationStateCheckResult(id) {
+function getStationStateCheckResult(id) { //状态校验
   ticketStateCheck(id).then((res)=>{
     if (res.code === 200) {
       restTicket(id);
+    } else {
+      console.error(res.code, res.msg);
+      Toast.fail("状态校验失败");
+      return;
     }
   }).catch(error => {
     console.error(error);
   })
 }
 
-//拓扑校验
-function getStationOperationCheckResult(id) {
+function getStationOperationCheckResult(id) { //拓扑校验
   stationOperationCheck(id).then((res)=>{
     if (res.code === 200) {
       restTicket(id);
+    } else {
+      console.error(res.code, res.msg);
+      Toast.fail("拓扑校验失败");
+      return;
     }
   }).catch(error => {
     console.error(error);
   })
 }
 
-const restTicket = (id) => {
-  steps_loading.value = true;
-  ticketList.value = null; // 清空数据等待再次获取
-  getTicketResult(id);
-}
-
-const checkType = computed(()=>{
-  return ticketList.value.checkType
-})
-
-const isCheck = (data, key, type) => {
-  if (data && !key && !type) {
-    if (data.parCheck === 'no' || data.stationCheck === 'no' || data.operaCheck === 'no') {
-      return true;
-    } else {
-      return false;
-    }
+const onSelectState = (action) => {
+  let status = ''
+  switch(action.text) {
+    case '错误集': 
+      statusPop.value = 0;
+      status = '错误集'
+    break;
+    case '未校验': 
+      statusPop.value = 1;
+      status = '未校验'
+    break;
+    case '未审核': 
+      statusPop.value = 2;
+      status = '未审核'
+    break;
+    case '已初审': 
+      statusPop.value = 3;
+      status = '已初审'
+    break;
+    case '已生成': 
+      statusPop.value = 4;
+      status = '已生成'
+    break;
+    default: break;
   }
-
-  if (data && key === 'result') {
-    if (data.parCheck === 'no' || data.stationCheck === 'no' || data.operaCheck === 'no') {
-      return false;
-    } else {
-      return true;
-    }
+  
+  let params = {
+    status: status,
+    target: target.value,
+    search: search.value,
+    nprTime: nprTime.value,
+    offset: 0, 
+    limit: 99
   }
+  onSearch_2(params);
+};
 
-  if (type === 'yes') {
-    return data[key] && data[key] === 'yes'
-  } else if (type === 'no') {
-    return data[key] && data[key] === 'no'
-  } else {
-    return;
-  }
-}
+const onSearch_2 = (params) => { // 搜索数据
+  Toast.loading({
+    message: '搜索中...',
+    forbidClick: true,
+  });
 
-const isCheckColor = (data, key) => {
-  if (data && key) {
-    if (data[key] === 'yes') {
-      return '#67C23A'
-    } else if (data[key] === 'no') {
-      return '#f74747'
-    } else {
-      return '';
-    }
+  let thisParams = {
+    status: state.params.status,
+    target: target.value,
+    search: search.value,
+    nprTime: nprTime.value
   }
-}
-
-function getResultTagType(ticket) {
-  if (!ticket.description) {
-    return "";
-  } else if (ticket.keyCount > 0 || ticket.operationCount > 0 || ticket.stateCount > 0) {
-    return "danger";
-  } else {
-    return "success";
-  }
+  getData(params?params:thisParams, 'search');
+  list_loading.value = false;
 }
 </script>
 
@@ -569,34 +727,88 @@ function getResultTagType(ticket) {
     }
   }
 
-  .search {
-    .title {
-      text-align: center;
-      margin: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #737373;
-    }
-    .cell-item {
-      padding: 5px 8px;
-    }
-    .calendar-label {
-      .calendar-cell {
-        padding: 6px 9px;
-        background-color: #f7f8fa;
-        border-radius: 25px;
-        :deep(.van-cell__title) {
-          color: #c6c6c6;
-          span {
-            padding-left: 10px;
-          }
+  .search-page {
+    .van-popover {
+      margin: 5px 10px;
+      position: relative;
+      ::v-deep .van-popover__wrapper {
+        margin-right: 10px;
+      }
+      .van-button {
+        .van-icon {
+          font-size: 12px;
         }
       }
     }
-    .search-btn {
-      float: right;
-      margin: 8px 12px;
-      padding: 0 16px;
+    .search-input {
+      height: 237.25px;
+      .title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #737373;
+        padding: 10px;
+      }
+      .cell-item {
+        padding: 5px 8px;
+      }
+      .calendar-label {
+        .calendar-cell {
+          padding: 6px 9px;
+          background-color: #f7f8fa;
+          border-radius: 25px;
+          :deep(.van-cell__title) {
+            color: #c6c6c6;
+            span {
+              padding-left: 10px;
+            }
+          }
+        }
+      }
+      .search-btn {
+        float: right;
+        margin: 8px 12px;
+        padding: 0 16px;
+      }
+    }
+    .search-result {
+      height: 429.75px;
+      overflow-y: auto;
+      .table-item {
+        min-height: 80px;
+        padding: 5px 10px;
+        box-shadow: 0 0 5px #eee;
+        border: 1px solid $border-light;
+        border-radius: 5px;
+        .item-top {
+          width: 100%;
+          @include flex($justify-content: space-between, $text-align: left);
+          font-weight: bold;
+          color: #6b6b6b;
+          p {
+            font-size: 14px;
+            padding: 10px 0;
+          }
+        }
+        .item-bottom {
+          font-size: 13px;
+          @include flex($justify-content: space-between);
+          color: #888888;
+          .item {
+            .van-icon {
+              font-size: 13px
+            }
+            .time {
+              padding-left: 2px;
+            }
+          }
+
+          .check {
+            text-decoration: underline;
+            cursor: pointer;
+          }
+        }
+      }
     }
   }
 

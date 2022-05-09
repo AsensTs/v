@@ -29,19 +29,16 @@
       </div>
     </div>
     <ScrollTop :max="20" :len="listLen" @scrollTop="scrollTop"></ScrollTop>
-    
-    <transition enter-active-class="animate__animated animate__fadeInRight animate__faster" leave-active-class="animate__animated animate__fadeOut">
-      <SearchPage v-if="isSearchPage" dispath="search/permission_search">
-        <div class="title"><p>输电线路安全搜索</p></div>
-        <van-cell-group inset>
-          <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
-          <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
-          <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
-          <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
-          <van-button class="search-btn" type="primary" size="small">搜索</van-button>
-        </van-cell-group>
-      </SearchPage>
-    </transition>
+    <SearchPage v-if="isSearchPage" dispath="permissiongd_search">
+      <div class="title"><p>输电线路安全搜索</p></div>
+      <van-cell-group inset>
+        <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
+        <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
+        <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
+        <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
+        <van-button class="search-btn" type="primary" size="small">搜索</van-button>
+      </van-cell-group>
+    </SearchPage>
   </div>
 </template>
 
@@ -63,7 +60,7 @@ const listLen = ref(0);
 const listRef = ref('listRef');
 const store = useStore();
 const isSearchPage = computed(() => {
-  return store.getters['search/permission_search'];
+  return store.getters['search/permissiongd_search'];
 })
 const states = reactive({
   step: 0,
@@ -98,6 +95,10 @@ const getData = (params) => {
       if (res.data.length < 10) {
         finished.value = true;
       }
+    } else {
+      console.error(res.code, res.msg);
+      Toast.fail("获取数据失败");
+      return;
     }
   }).catch((error) => {
     console.error(error);
@@ -107,10 +108,10 @@ const getData = (params) => {
 // 下拉刷新
 const onRefresh = () => {
   setTimeout(() => {
-    Toast('刷新成功');
     refresh_loading.value = false;
     states.params =  { status: status, offset: 0, limit: 10 };
     getData(states.params);
+    Toast('刷新成功');
   }, 1000);
 };
 

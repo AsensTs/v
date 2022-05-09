@@ -1,5 +1,5 @@
 const pushState = (path) => {
-  history.pushState(null, null, `/#${path}/details`);
+  history.pushState(null, null, `/#${path}`);
 }
 
 export default pushState;

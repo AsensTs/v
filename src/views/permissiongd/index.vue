@@ -34,18 +34,51 @@
     </div>
     <ScrollTop :max="20" :len="listLen" @scrollTop="scrollTop"></ScrollTop>
     
-    <transition enter-active-class="animate__animated animate__fadeInRight animate__faster" leave-active-class="animate__animated animate__fadeOut">
-      <SearchPage v-if="isSearchPage" dispath="search/permissiongd_search">
-        <div class="title"><p>{{title}}</p></div>
-        <van-cell-group inset>
-          <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round"/>
-          <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round"/>
-          <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
-          <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
-          <van-button class="search-btn" type="primary" size="small">搜索</van-button>
-        </van-cell-group>
-      </SearchPage>
-    </transition>
+    <SearchPage dispath="permissiongd_search">
+      <div class="title"><p>{{title}}</p></div>
+      <van-cell-group inset>
+        <van-search class="cell-item" v-model="sqdw" placeholder="申请单位" clearable  shape="round" @search="onSearch"/>
+        <van-search class="cell-item" v-model="txr" placeholder="填写人" clearable  shape="round" @search="onSearch"/>
+        <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="sqrq" @click="showCalendar = true" /></div>
+        <ts-calendar v-model:show="showCalendar" title="选择日期" :show-confirm="false" @confirm="onSearch"></ts-calendar>
+        <!-- <van-button class="search-btn" type="primary" size="small">搜索</van-button> -->
+        <div class="van-popover">
+          <van-popover v-model:show="showStatePopover" :actions="stateOptions" @select="onSelectState" style="margin: 10px;">
+            <template #reference>
+              <van-button size="mini">{{stateOptions[state].text}}<van-icon name="arrow-down" /></van-button>
+            </template>
+          </van-popover>
+          <van-popover v-model:show="showResultPopover" :actions="resultOptions" @select="onSelectResult">
+            <template #reference>
+              <van-button size="mini">{{checkResultText?checkResultText:'选择结果'}}<van-icon name="arrow-down" /></van-button>
+            </template>
+          </van-popover>
+          <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;margin-top:5px;">共搜索到 {{searchData.length}} 条数据</p>
+        </div>
+      </van-cell-group>
+      <div class="search-result">
+        <van-list
+          v-model:loading="list_loading"
+          :finished="finished"
+          finished-text="没有更多了"
+          @load="onLoad"
+        >
+          <van-cell v-for="item in searchData" :key="item" > 
+            <div class="table-item" @click="handleClick(item)">
+              <div class="item-bottom">
+                <div class="item">申请单位：{{item.sqdw}}</div>
+                <div class="item">申请日期：<span class="time">{{formaDate(item.sqrq, "yyyy-MM-dd hh:mm:ss")}}</span></div>
+                <div class="item"><p>操作任务：{{item.czrw}}</p></div>
+                <div class="item">许可来源：{{item.xklx}}</div>
+                <div class="item">填写人：{{item.txr}}</div>
+                <div class="item">结果：<van-tag :type="formaResult(item.checkResult).type">{{formaResult(item.checkResult).text}}</van-tag></div>
+                <!-- <div class="item"><van-button type="primary" size="mini" style="padding:3px 10px" @click="handleClick(item)">查看详情</van-button></div> -->
+              </div>
+            </div>
+          </van-cell>
+        </van-list>
+      </div>
+    </SearchPage>
     
     <transition enter-active-class="animate__animated animate__fadeInRight animate__faster" leave-active-class="animate__animated animate__fadeOut">
       <DetailsPage v-if="isDetailsPage" title="书面许可申请">
@@ -116,6 +149,7 @@ import ScrollTop from '@components/scrollTop'
 import DetailsPage from '@components/details'
 import tsTable from '@components/table/ts-table'
 import tsTableItem from '@components/table/ts-table-item'
+import TsCalendar from '@components/calendar'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router';
 import filter from '@utils/filter'
@@ -131,21 +165,29 @@ const listLen = ref(0);
 const listRef = ref('listRef');
 const store = useStore();
 const route = useRoute();
-const isSearchPage = computed(() => {
-  return store.getters['search/permission_search'];
-})
+
 const states = reactive({
   step: 0,
   params: { state: 1, offset: 0, limit: 10, },
   limit: 0
 })
 const stateOptions = [
-  { text: '已提交调度', value: 1 },
   { text: '待提交调度', value: 0 },
+  { text: '已提交调度', value: 1 },
 ];
-const target = ref('');
-const search = ref('');
-const nprTime = ref('');
+const resultOptions = [
+  { text: '正确', value: 'TRUE' },
+  { text: '错误', value: 'FALSE' },
+  { text: '未审核', value: "NONE" }
+];
+const sqdw = ref('');
+const txr = ref('');
+const sqrq = ref('');
+const checkResult = ref('');
+const checkResultText = ref('');
+const searchData = ref(null);
+const showResultPopover = ref(false);
+const showStatePopover = ref(false);
 const showCalendar = ref(false);
 const formaDate = filter.formaDate;
 const errorResult = ref(false);
@@ -181,14 +223,23 @@ const onLoad = () => {
   list_loading.value = false;
 }
 
-const getData = (params) => {
+const getData = (params, type) => {
   getPermissiongd(params).then(res => {
     if (res.code === 200) {
       list.value = [...list.value, ...res.data];
       
+      if (type == 'search') {
+        searchData.value = res.data;
+        return;
+      }
+
       if (res.data.length < 10) {
         finished.value = true;
       }
+    } else {
+      console.error(res.code, res.msg);
+      Toast.fail("获取数据失败");
+      return;
     }
   }).catch((error) => {
     console.error(error);
@@ -198,10 +249,10 @@ const getData = (params) => {
 // 下拉刷新
 const onRefresh = () => {
   setTimeout(() => {
-    Toast('刷新成功');
     refresh_loading.value = false;
     states.params =  { state: state, offset: 0, limit: 10 };
     getData(states.params);
+    Toast('刷新成功');
   }, 1000);
 };
 
@@ -227,9 +278,28 @@ const scrollTop = async () => {
   listLen.value = 0;
 }
 
-const onConfirm = (value) => {
-  showCalendar.value = false;
-  nprTime.value = formaDate(value, 'yyyy-MM-dd');
+const onSearch = (value) => {
+  if (value instanceof Date) {
+    sqrq.value = filter.formaDate(value, 'yyyy-MM-dd');
+    if (showCalendar.value) showCalendar.value = false;     // 关闭日历
+  }
+
+  Toast.loading({
+    message: '搜索中...',
+    forbidClick: true,
+  });
+
+  let params = {
+    sqdw: sqdw.value,
+    txr: txr.value,
+    sqrq: sqrq.value,
+    offset: 0,
+    state: state.value,
+    checkResult: checkResult.value
+  }
+  console.log(params);
+  getData(params, 'search');
+  list_loading.value = false;
 }
 
 const formaResult = (result) => {
@@ -246,8 +316,14 @@ const handleClick = (data) => {
   store.dispatch('details/permissiongd_details', true);
   detailsInfo.value = data;
   stepTableData.value = JSON.parse(data.czbz);
-  pushState(route.fullPath);
+  pushState(route.fullPath + '/details');
   getPCheckResult(data.instId, {offset: 0, limit: 10000}).then((res)=>{
+    if (res.code !== 200) {
+      console.error(res.code, res.msg);
+      Toast.fail("获取数据失败");
+      return;
+    }
+    
     if (data.checkResult == "FALSE") {
       errorResult.value = true;
     }
@@ -300,6 +376,34 @@ const handleClick = (data) => {
     console.error(error);
   })
 }
+
+const onSelectResult = (action) => {
+  switch(action.text) {
+    case '正确': 
+      checkResult.value = 'TRUE'; 
+      checkResultText.value = '正确';
+    break;
+    case '错误': 
+      checkResult.value = 'FALSE'; 
+      checkResultText.value = '错误';
+    break;
+    case '未审核': 
+      checkResult.value = 'NONE'; 
+      checkResultText.value = '未审核';
+    break;
+    default: break;
+  }
+  onSearch();
+};
+
+const onSelectState = (action) => {
+  switch(action.text) {
+    case '已提交调度': state.value = 1; break;
+    case '待提交调度': state.value = 0; break;
+    default: break;
+  }
+  onSearch();
+};
 </script>
 
 <style lang="scss" scoped>
@@ -354,10 +458,26 @@ const handleClick = (data) => {
 
   .search-page {
     .title {
-      @include title($margin: 10px, $font-size: 16px, $color: #737373);
+      height: 45px;
+      @include title($font-size: 16px, $color: #737373);
+    }
+    .van-cell-group {
+      height: 170px;
     }
     .cell-item {
-      padding: 5px 8px;
+      padding: 3px 8px;
+    }
+    .van-popover {
+      margin: 3px 10px;
+      position: relative;
+      ::v-deep .van-popover__wrapper {
+        margin-right: 10px;
+      }
+      .van-button {
+        .van-icon {
+          font-size: 12px;
+        }
+      }
     }
     .calendar-label {
       .calendar-cell {
@@ -376,6 +496,37 @@ const handleClick = (data) => {
       float: right;
       margin: 8px 12px;
       padding: 0 16px;
+    }
+    .search-result {
+      height: 452px;
+      background: $bg-color;
+      border-radius: 10px;
+      overflow: auto;
+      .table-item {
+        padding: 10px 16px;
+        box-shadow: 0 0 5px #eee;
+        border: 1px solid $border-light;
+        border-radius: 5px;
+        background: #fbfcff;
+        .item-bottom {
+          font-size: 14px;
+          color: #888888;
+          .item {
+            .time {
+              padding-left: 2px;
+            }
+          }
+          .czrw {
+            width: 100%;
+            color: #6b6b6b;
+            p {
+              width: 100%;
+              @include ellipsis();
+              
+            }
+          }
+        }
+      }
     }
   }
   
@@ -420,6 +571,7 @@ const handleClick = (data) => {
         border-radius: 10px;
         padding: 10px;
         margin: 10px 0;
+        font-size: 14px;
         .row {
           margin: 5px 0;
         }

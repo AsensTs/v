@@ -14,6 +14,7 @@ import { ref, toRaw, defineEmits, defineProps } from "vue"
 import { setClassName, delClassName } from "@utils/base"
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
+import pushState from '@/utils/pushState'
 const showInput = ref(false);
 const searchContainerRef = ref('searchContainerRef');
 const searchRef = ref('searchRef');
@@ -62,7 +63,7 @@ const handleOpenSearchPage = async () => {
   // 去掉外层搜索框的焦点
   searchRef.value.blur();
   // 添加一个状态（state）, 控制搜索页面的物理返回。
-  history.pushState(null, null, `/#${route.fullPath}/search`); 
+  pushState(`${route.fullPath}/search`); 
 
   let dispath = '';
   switch (route.fullPath) {
@@ -70,7 +71,7 @@ const handleOpenSearchPage = async () => {
       dispath = 'search/substationCheck_search';
       break;
     case '/permissiongd': 
-      dispath = 'search/permission_search';
+      dispath = 'search/permissiongd_search';
       break;
     case '/schedulingPar': 
       dispath = 'search/schedulingPar_search';

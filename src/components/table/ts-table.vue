@@ -1,5 +1,5 @@
 <template>
-  <div class="table-title">{{title}}</div>
+  <div class="table-title" :style="{textAlign: titleAlign?titleAlign:'center'}">{{title}}</div>
   <table :border="border?1:0" width="100%">
     <colgroup>
       <col v-for="(w, index) in widths" :name="'el-table_1_column_'+index" :key="'el-table_1_column_'+index" :width="w">
@@ -33,7 +33,8 @@ export default {
     border: {
       type: Boolean,
       default: false
-    }
+    },
+    titleAlign: String
   },
   data() {
     return {
@@ -71,6 +72,6 @@ export default {
   text-align: center;
   font-size: 14px;
   font-weight: bold;
-  padding: 10px 0;
+  padding: 10px 20px;
 }
 </style>

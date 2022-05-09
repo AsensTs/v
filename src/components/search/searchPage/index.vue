@@ -1,18 +1,16 @@
 <template>
-  <div id="search-page" class="search-page"  @click="handleCloseSearchPage" >
-    <div class="search">
-      <div @click.stop="()=>{}"> 
-        <slot></slot>
-      </div>
-    </div>
+<van-popup class="search-page" v-model:show="isSearchPage" @close="handleCloseSearchPage" position="right" closeable :style="{ height: '100%', width: '100%' }">
+  <div>
+    <slot></slot>
   </div>
+</van-popup>
 </template>
 
 <script setup>
-import { defineProps, onMounted } from 'vue'
+import { computed, defineProps } from 'vue'
 import { useStore } from 'vuex';
-import { removeTouch } from '@utils/touchs'
 import { useRoute } from 'vue-router';
+import pushState from '@/utils/pushState'
 const props = defineProps({
   dispath: {
     type: String,
@@ -21,14 +19,20 @@ const props = defineProps({
 })
 const store = useStore();
 const route = useRoute();
+let dp = ''
+if (props.dispath.indexOf('search/') !== -1) {
+  dp = props.dispath + '';
+} else {
+  dp = 'search/' + props.dispath;
+}
 
-onMounted(()=>{
-  removeTouch(document.getElementById('search-page'))
+const isSearchPage = computed(() => {  // search-page
+  return store.getters[dp];
 })
 
 const handleCloseSearchPage = () => {
-  store.dispatch(props.dispath, false);
-  history.pushState(null, null, `/#${route.fullPath}`); 
+  store.dispatch(dp, false);
+  pushState(route.fullPath); 
 }
 
 

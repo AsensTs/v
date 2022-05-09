@@ -14,7 +14,7 @@
 
 
 /*文本格式化，超出范围，显示省略号*/
-@mixin ellipsis($width:null, $display:block, $clamp: 0) {
+@mixin ellipsis($width:null, $display:block, $white-space: nowrap, $clamp: 0) {
   @if ($width != null) {
     width: $width;
   }
@@ -23,7 +23,7 @@
   text-overflow: ellipsis;
   -ms-text-overflow: ellipsis;
   @if ($clamp == 0) {
-    white-space: nowrap
+    white-space: $white-space
   } @else {
     display: -webkit-box;
     -webkit-line-clamp: $clamp;

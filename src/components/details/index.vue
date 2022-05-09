@@ -15,6 +15,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { removeTouch } from '@utils/touchs'
+import pushState from '@/utils/pushState'
 export default {
   name: 'details-page',
   props: {
@@ -32,7 +33,7 @@ export default {
       closeDetails: 'details/close_details'
     }),
     handleCloseDetailsPage() {
-      history.pushState(null, null, `/#${this.$route.fullPath}`);
+      pushState(this.$route.fullPath);
       this.closeDetails();
     }
   }
