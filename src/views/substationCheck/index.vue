@@ -74,7 +74,7 @@
                 </template>
               </van-popover>
             </div>
-            <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">共搜索到 {{searchData.length >= 99?'99+':searchData.length}} 条数据</p>
+            <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">共搜索到 {{searchData.length >= 999?'999':searchData.length}} 条数据</p>
         </van-cell-group>
       </div>
       <div class="search-result">
@@ -318,28 +318,6 @@ const scrollTop = async () => { // 返回顶部
   let dom = toRaw(listRef.value);
   dom.scrollTop = 0;
   listLen.value = 0;
-}
-
-const onSearch = (value) => { // 搜索数据
-  if (value instanceof Date) {
-    nprTime.value = filter.formaDate(value, 'yyyy-MM-dd');
-    if (show.value) show.value = false;     // 关闭日历
-  }
-
-  Toast.loading({
-    message: '搜索中...',
-    forbidClick: true,
-  });
-
-  let params = {
-    status: state.params.status,
-    target: target.value,
-    search: search.value,
-    nprTime: nprTime.value
-  }
-  console.log(params);
-  getData(params, 'search');
-  list_loading.value = false;
 }
 
 const handleItemCheck = (data) => {
@@ -647,6 +625,30 @@ const onSelectState = (action) => {
   }
   onSearch_2(params);
 };
+
+const onSearch = (value) => { // 搜索数据
+  if (value instanceof Date) {
+    nprTime.value = filter.formaDate(value, 'yyyy-MM-dd');
+    if (show.value) show.value = false;     // 关闭日历
+  }
+
+  Toast.loading({
+    message: '搜索中...',
+    forbidClick: true,
+  });
+
+  let params = {
+    status: state.params.status,
+    target: target.value,
+    search: search.value,
+    nprTime: nprTime.value,
+    offset: 0,
+    limit: 1000
+  }
+  console.log(params);
+  getData(params, 'search');
+  list_loading.value = false;
+}
 
 const onSearch_2 = (params) => { // 搜索数据
   Toast.loading({

@@ -34,14 +34,32 @@
     <ScrollTop :max="20" :len="listLen" @scrollTop="scrollTop"></ScrollTop>
     
     <SearchPage dispath="schedulingPar_search">
-      <div class="title"><p>{{ title }}</p></div>
+      <div class="title"><p>{{title}}</p></div>
       <van-cell-group inset>
-        <van-search class="cell-item" v-model="czmd" placeholder="工作任务" clearable  shape="round"/>
-        <van-search class="cell-item" v-model="description" placeholder="结果" clearable  shape="round"/>
-        <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="拟票时间：" :value="nprTime" @click="showCalendar = true" /></div>
-        <van-calendar v-model:show="showCalendar" @confirm="onConfirm" />
-        <van-button class="search-btn" type="primary" size="small">搜索</van-button>
+        <van-search class="cell-item" v-model="gzrw" placeholder="工作任务" clearable  shape="round" @search="onSearch"/>
+        <van-search class="cell-item" v-model="ph" placeholder="票号" clearable  shape="round" @search="onSearch"/>
+        <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="创建日期：" :value="createsj" @click="showCalendar = true" /></div>
+        <ts-calendar v-model:show="showCalendar" title="选择日期" :show-confirm="false" @confirm="onSearch"></ts-calendar>
+        <!-- <van-button class="search-btn" type="primary" size="small">搜索</van-button> -->
+        <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">{{searchData.length >= 999?'999':searchData.length}} 条数据</p>
       </van-cell-group>
+      <van-list>
+        <van-cell v-for="item in searchData" :key="item" > 
+          <div class="table-item" @click="handleClickItem(item)">
+            <div class="item-top"><p>{{item.czmd}}</p></div>
+            <div class="item-bottom">
+              <div class="item">拟票人：{{item.nlr}}</div>
+              <div class="item"><span class="time">{{formaDate(item.nprTime, "yyyy-MM-dd hh:mm:ss")}}</span></div>
+              <!-- <div class="item czrw">工作任务：{{item.czmd}}</div> -->
+              <div class="item"><van-tag :type="formaResult(item.description).type">{{formaResult(item.description).text}}</van-tag></div>
+            </div>
+            <div class="item-btnGroup">
+              <van-button size="mini" style="margin-right: 10px;" @click.stop="handleCheckMsg(item)">短信查询</van-button>
+              <van-button size="mini" @click="handleClickItem(item)">查看详情</van-button>
+            </div>
+          </div>
+        </van-cell>
+      </van-list>
     </SearchPage>
    
     <transition :enter-active-class="animate('fadeInRight animate__faster')" :leave-active-class="animate('fadeOut animate__faster')">
@@ -132,6 +150,7 @@ import { predictateTicket, predictateTicketDetails, predictateTicketAgainCheck, 
 import SearchPage from '@components/search/searchPage'
 import ScrollTop from '@components/scrollTop'
 import DetailsPage from '@components/details'
+import TsCalendar from '@components/calendar'
 import filter from '@utils/filter'
 import animate from '@utils/animate'
 import pushState from '@/utils/pushState'
@@ -155,10 +174,13 @@ const states = reactive({
   params: { offset: 0, limit: 10, },
   limit: 0
 })
-const description = ref('');
-const czmd = ref('');
-const nprTime = ref('');
+// search
+const gzrw = ref('');
+const ph = ref('');
+const createsj = ref('');
 const showCalendar = ref(false);
+const searchData = ref([])
+
 const ticketDetails = ref(null); // details data
 const workTaskError = ref(null);
 const orderList = ref(null);
@@ -173,18 +195,27 @@ watch(listLen, (newListLen) => {
   listLen.value = newListLen
 })
 
-// 加载数据
-const onLoad = async () => {
+
+const onLoad = async () => { // 加载数据
   states.step += 10;
   states.params.offset = states.step - 10;
   listLen.value = states.step;
-  getData(states.params)
+  let res = await getData(states.params);
+  if (res.code == 200) list.value = [...list.value, ...res.data];
   list_loading.value = false;
 }
 
-const getData = async (params) => {
+const getData = async (params) => { // 请求数据
   let res = await predictateTicket(params);
-  list.value = [...list.value, ...res.data];
+  return res
+  // if (res.code == 200) {
+  //   if (type === 'search') {
+  //     searchData.value = res.data;
+  //     return;
+  //   }
+
+  //   list.value = [...list.value, ...res.data];
+  // }
 }
 
 const onRefresh = () => {
@@ -196,17 +227,35 @@ const onRefresh = () => {
   }, 1000);
 };
 
-// 返回顶部
-const scrollTop = async () => {
+const scrollTop = async () => { // 返回顶部
   await nextTick();
   let dom = toRaw(listRef.value);
   dom.scrollTop = 0;
   listLen.value = 0;
 }
 
-const onConfirm = (value) => {
-  showCalendar.value = false;
-  nprTime.value = formaDate(value, 'yyyy-MM-dd');
+const onSearch = async (value) => { // 搜索
+  if (value instanceof Date) {
+    createsj.value = filter.formaDate(value, 'yyyy-MM-dd');
+    if (showCalendar.value) showCalendar.value = false;     // 关闭日历
+  }
+
+  Toast.loading({
+    message: '搜索中...',
+    forbidClick: true,
+  });
+
+  let params = {
+    gzrw: gzrw.value,
+    ph: ph.value,
+    createsj: createsj.value,
+    offset: 0,
+    limit: 1000
+  }
+
+  let res = await getData(params);
+  if (res.code == 200) searchData.value = res.data;
+  list_loading.value = false;
 }
 
 const formaResult = (result) => {
@@ -351,32 +400,74 @@ const handleCheckMsg = (data) => {
   
   .search-page {
     .title {
-      text-align: center;
-      margin: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #737373;
+      height: 45px;
+      @include title($font-size: 16px, $color: #737373);
     }
-    .cell-item {
-      padding: 5px 8px;
-    }
-    .calendar-label {
-      .calendar-cell {
-        padding: 6px 9px;
-        background-color: #f7f8fa;
-        border-radius: 25px;
-        :deep(.van-cell__title) {
-          color: #c6c6c6;
-          span {
-            padding-left: 10px;
+    .van-cell-group {
+      height: 154px;
+      .cell-item {
+        padding: 5px 8px;
+      }
+      .calendar-label {
+        .calendar-cell {
+          padding: 6px 9px;
+          background-color: #f7f8fa;
+          border-radius: 25px;
+          :deep(.van-cell__title) {
+            color: #c6c6c6;
+            span {
+              padding-left: 10px;
+            }
           }
         }
       }
+      .search-btn {
+        float: right;
+        margin: 8px 12px;
+        padding: 0 16px;
+      }
     }
-    .search-btn {
-      float: right;
-      margin: 8px 12px;
-      padding: 0 16px;
+    .van-list {
+      height: 468px;
+      overflow: auto;
+      .table-item {
+        border: 1px solid #e4e7ed;
+        border-radius: 10px;
+        padding: 5px 10px;
+        .item-top {
+          width: 100%;
+          line-height: 40px;
+          @include flex($justify-content: space-between, $text-align: left);
+          font-weight: bold;
+          color: #6b6b6b;
+          p {
+            width: 95%;
+            @include ellipsis();
+            font-size: 14px;
+          }
+        }
+        .item-bottom {
+          font-size: 13px;
+          @include flex($justify-content: space-between);
+          color: #888888;
+          .item {
+            .van-icon {
+              font-size: 13px
+            }
+            .time {
+              padding-left: 2px;
+            }
+          }
+
+          .check {
+            text-decoration: underline;
+            cursor: pointer;
+          }
+        }
+        .item-btnGroup {
+          margin-top: 5px;
+        }
+      }
     }
   }
 

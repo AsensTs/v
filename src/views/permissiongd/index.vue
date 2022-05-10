@@ -53,16 +53,11 @@
               <van-button size="mini">{{checkResultText?checkResultText:'选择结果'}}<van-icon name="arrow-down" /></van-button>
             </template>
           </van-popover>
-          <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;margin-top:5px;">共搜索到 {{searchData.length}} 条数据</p>
+          <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">{{searchData.length >= 999?'999':searchData.length}} 条数据</p>
         </div>
       </van-cell-group>
       <div class="search-result">
-        <van-list
-          v-model:loading="list_loading"
-          :finished="finished"
-          finished-text="没有更多了"
-          @load="onLoad"
-        >
+        <van-list>
           <van-cell v-for="item in searchData" :key="item" > 
             <div class="table-item" @click="handleClick(item)">
               <div class="item-bottom">
@@ -209,45 +204,33 @@ const tableData =  ref([
   { type: "STEP", result: "true", content: ""}
 ])
 
-// 直接监听 ref
-watch(listLen, (newListLen) => {
+watch(listLen, (newListLen) => { // 直接监听 ref
   listLen.value = newListLen
 })
 
-// 加载数据
-const onLoad = () => {
+const onLoad = async() => { // 加载数据
   states.step += 10;
   states.params.offset = states.step - 10;
   listLen.value = states.step;
-  getData(states.params);
+  let res = await getData(states.params);
+  if (res.code == 200) list.value = [...list.value, ...res.data];
   list_loading.value = false;
 }
 
-const getData = (params, type) => {
-  getPermissiongd(params).then(res => {
-    if (res.code === 200) {
-      list.value = [...list.value, ...res.data];
-      
-      if (type == 'search') {
-        searchData.value = res.data;
-        return;
-      }
-
+const getData = (params) => { // 获取数据
+  return new Promise((resolve, reject) => {
+    getPermissiongd(params).then(res => {
       if (res.data.length < 10) {
         finished.value = true;
       }
-    } else {
-      console.error(res.code, res.msg);
-      Toast.fail("获取数据失败");
-      return;
-    }
-  }).catch((error) => {
-    console.error(error);
+      resolve(res);
+    }).catch((error) => {
+      reject(error)
+    })
   })
 }
 
-// 下拉刷新
-const onRefresh = () => {
+const onRefresh = () => { // 下拉刷新
   setTimeout(() => {
     refresh_loading.value = false;
     states.params =  { state: state, offset: 0, limit: 10 };
@@ -256,8 +239,7 @@ const onRefresh = () => {
   }, 1000);
 };
 
-// 选择状态(status)
-const handleChange = async (value) => {
+const handleChange = async (value) => {  // 选择状态(status)
   finished.value = false;
   list_loading.value = true;
   list.value = [];
@@ -270,15 +252,14 @@ const handleChange = async (value) => {
   onLoad();
 }
 
-// 返回顶部
-const scrollTop = async () => {
+const scrollTop = async () => { // 返回顶部
   await nextTick();
   let dom = toRaw(listRef.value);
   dom.scrollTop = 0;
   listLen.value = 0;
 }
 
-const onSearch = (value) => {
+const onSearch = async (value) => {
   if (value instanceof Date) {
     sqrq.value = filter.formaDate(value, 'yyyy-MM-dd');
     if (showCalendar.value) showCalendar.value = false;     // 关闭日历
@@ -293,12 +274,14 @@ const onSearch = (value) => {
     sqdw: sqdw.value,
     txr: txr.value,
     sqrq: sqrq.value,
-    offset: 0,
     state: state.value,
-    checkResult: checkResult.value
+    checkResult: checkResult.value,
+    offset: 0,
+    limit: 1000,
   }
   console.log(params);
-  getData(params, 'search');
+  let res = await getData(params);
+  searchData.value = res.data;
   list_loading.value = false;
 }
 
@@ -312,6 +295,7 @@ const formaResult = (result) => {
 const isDetailsPage = computed(() => {
   return store.getters['details/permissiongd_details'];
 })
+
 const handleClick = (data) => {
   store.dispatch('details/permissiongd_details', true);
   detailsInfo.value = data;

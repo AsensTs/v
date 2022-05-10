@@ -67,7 +67,7 @@ const actions = {
 }
 
 const getters = {
-  authUser: () => state.authName
+  authUser: (state) => state.authName
 }
 
 

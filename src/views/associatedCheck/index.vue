@@ -34,12 +34,29 @@
     <SearchPage dispath="associatedCheck_search">
       <div class="title"><p>{{title}}</p></div>
       <van-cell-group inset>
-        <van-search class="cell-item" v-model="target" placeholder="操作任务" clearable  shape="round" @search="onSearch"/>
-        <van-search class="cell-item" v-model="search" placeholder="站点" clearable  shape="round" @search="onSearch"/>
-        <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="选择日期：" :value="nprTime" @click="showCalendar = true" /></div>
-        <van-calendar v-model:show="showCalendar" @confirm="onSearch" />
-        <van-button class="search-btn" type="primary" size="small">搜索</van-button>
+        <van-search class="cell-item" v-model="czmd" placeholder="工作任务" clearable  shape="round" @search="onSearch"/>
+        <van-search class="cell-item" v-model="czpbh" placeholder="操作票编号" clearable  shape="round" @search="onSearch"/>
+        <van-search class="cell-item" v-model="allczdw" placeholder="站点" clearable  shape="round" @search="onSearch"/>
+        <div class="cell-item calendar-label"><van-cell class="calendar-cell" title="审核日期：" :value="shsj1" @click="showCalendar = true" /></div>
+        <ts-calendar v-model:show="showCalendar" title="选择日期" :show-confirm="false" @confirm="onSearch"></ts-calendar>
+        <p v-if="searchData && searchData.length" style="text-align:center;color:#c6c6c6;font-size: 12px;">{{searchData.length >= 999?'999':searchData.length}} 条数据</p>
+        <!-- <van-button class="search-btn" type="primary" size="small">搜索</van-button> -->
       </van-cell-group>
+      <van-list>
+        <van-cell v-for="item in searchData" :key="item" > 
+          <div class="table-item">
+            <div class="item-bottom">
+              <div class="item">操作票编号：{{item.czpbh}}</div>
+              <div class="item">拟票时间：{{item.npr_time.split('.')[0]}}</div>
+              <div class="item">审核时间：{{item.shsj1.split('.')[0]}}</div>
+              <div class="item">已关联变电票数量：{{item.associationTicketCount}}</div>
+              <div class="item">站点：{{item.allczdw}}</div>
+              <div class="item"><p>工作任务: {{item.czmd}}</p></div>
+              <div class="item"><van-button type="primary" size="mini" @click="handleClickDetails(item)">详情</van-button></div>
+            </div>
+          </div>
+        </van-cell>
+      </van-list>
     </SearchPage>
 
     <DetailsPage store="associatedCheck_details">
@@ -128,6 +145,7 @@ import { associatedOPerTicket, associatedDetails, associatedUnbindTicket, relati
 import SearchPage from '@components/search/searchPage'
 import DetailsPage from '@components/detailsPage'
 import ScrollTop from '@components/scrollTop'
+import TsCalendar from '@components/calendar'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import pushState from '@/utils/pushState'
@@ -148,12 +166,14 @@ const states = reactive({
   params: { offset: 0, limit: 10 },
   limit: 0
 })
-const target = ref('');
-const search = ref('');
-const nprTime = ref('');
+const czmd = ref('');
+const czpbh = ref('');
+const allczdw = ref('');
+const shsj1 = ref('');
 const showCalendar = ref(false);
-const formaDate = filter.formaDate;
+const searchData = ref([]);
 
+const formaDate = filter.formaDate;
 const d_label = ref(6); 
 const d_value = ref(18);
 // details
@@ -174,29 +194,25 @@ watch(listLen, (newListLen) => {
 })
 
 // 加载数据
-const onLoad = () => {
+const onLoad = async () => {
   states.step += 10;
   states.params.offset = states.step - 10;
   listLen.value = states.step;
-  getData(states.params);
+  let res = await getData(states.params);
+  list.value = [...list.value, ...res.data];
   list_loading.value = false;
 }
 
-const getData = (params) => {
-  associatedOPerTicket(params).then(res => {
-    if (res.code === 200) {
-      list.value = [...list.value, ...res.data];
-      
+const getData = (params) => { // 获取数据
+  return new Promise((resolve, reject) => {
+    associatedOPerTicket(params).then(res => {
       if (res.data.length < 10) {
         finished.value = true;
       }
-    } else {
-      console.error(res.code, res.msg);
-      Toast.fail("获取数据失败");
-      return;
-    }
-  }).catch((error) => {
-    console.error(error);
+      resolve(res);
+    }).catch((error) => {
+      reject(error)
+    })
   })
 }
 
@@ -216,9 +232,31 @@ const scrollTop = async () => { // 返回顶部
   listLen.value = 0;
 }
 
-const onSearch = (value) => { //搜索
-  showCalendar.value = false;
-  nprTime.value = formaDate(value, 'yyyy-MM-dd');
+const onSearch = async (value) => { //搜索
+  if (value instanceof Date) {
+    shsj1.value = filter.formaDate(value, 'yyyy-MM-dd');
+    if (showCalendar.value) showCalendar.value = false;     // 关闭日历
+  }
+
+  Toast.loading({
+    message: '搜索中...',
+    forbidClick: true,
+  });
+
+  let params = {
+    czmd: "",
+    czpbh: "",
+    allczdw: "",
+    shsj1: "",
+    offset: 0,
+    limit: 1000
+  }
+
+  let res = await getData(params);
+  if (res.code == 200) {
+    searchData.value = res.data;
+    list_loading.value = false;
+  }
 }
 
 const handleClickDetails = (data) => { // 点击进入详情
@@ -426,26 +464,56 @@ const handleCzpDetails = (data) => { // 获取操作票详情数据
       font-weight: bold;
       color: #737373;
     }
-    .cell-item {
-      padding: 5px 8px;
-    }
-    .calendar-label {
-      .calendar-cell {
-        padding: 6px 9px;
-        background-color: #f7f8fa;
-        border-radius: 25px;
-        :deep(.van-cell__title) {
-          color: #c6c6c6;
-          span {
-            padding-left: 10px;
+    .van-cell-group {
+      .cell-item {
+        padding: 5px 8px;
+      }
+      .calendar-label {
+        .calendar-cell {
+          padding: 6px 9px;
+          background-color: #f7f8fa;
+          border-radius: 25px;
+          :deep(.van-cell__title) {
+            color: #c6c6c6;
+            span {
+              padding-left: 10px;
+            }
           }
         }
       }
+      .search-btn {
+        float: right;
+        margin: 8px 12px;
+        padding: 0 16px;
+      }
     }
-    .search-btn {
-      float: right;
-      margin: 8px 12px;
-      padding: 0 16px;
+    .van-list {
+      height: 468px;
+      overflow: auto;
+      .table-item {
+        padding: 10px 16px;
+        box-shadow: 0 0 5px #eee;
+        border: 1px solid $border-light;
+        border-radius: 5px;
+        background: #fbfcff;
+        .item-bottom {
+          font-size: 14px;
+          color: #717171;
+          .item {
+            .time {
+              padding-left: 2px;
+            }
+          }
+          .gzrw {
+            width: 100%;
+            color: #2e2e2e;
+            p {
+              width: 100%;
+              @include ellipsis($clamp: 2);
+            }
+          }
+        }
+      }
     }
   }
 

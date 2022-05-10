@@ -4,7 +4,7 @@ function resolve(src) {
   return path.join(__dirname, src);
 }
 
-// webpack.config.js
+// webpack.config.js element-plus auto import
 const AutoImport = require('unplugin-auto-import/webpack')
 const Components = require('unplugin-vue-components/webpack')
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
@@ -28,6 +28,7 @@ module.exports = {
       proxy: {
         "/": {
           target: "http://192.168.3.106:8002/",
+          // target: "http://192.168.3.17:8002/"
         }
       },
       hot: true

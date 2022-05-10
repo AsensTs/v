@@ -13,7 +13,7 @@ import searchInput from '@components/search/searchInput'
 import { useStore } from 'vuex'
 
 const store = useStore();
-const title = store.getters['common/appTitle']
+const title = store.getters['common/appTitle'];
 </script>
 <style lang="scss" scoped>
 @import '@styles/mixin.scss';

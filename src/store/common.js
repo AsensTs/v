@@ -1,12 +1,13 @@
-import { getStorage } from '@utils/localStorage';
+// import { getStorage } from '@utils/localStorage';
 
 const state = {
-  appTitle: '' || getStorage("common/appTitle"),
+  appTitle: '',
   activeNavIndex: 1
 }
 
 const mutations = {
   'APP_TITLE': (state, value) => {
+    console.log(value, 'vuex');
     state.appTitle = value;
   },
   'NAV_ACTIVE': (state, value) => {
@@ -24,8 +25,8 @@ const actions = {
 }
 
 const getters = {
-  appTitle: () => state.appTitle,
-  activeNavIndex: () => state.activeNavIndex
+  appTitle: (state) => state.appTitle,
+  activeNavIndex: (state) => state.activeNavIndex
 }
 
 
