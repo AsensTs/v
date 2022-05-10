@@ -23,8 +23,8 @@
                   <div class="item"><span class="label">批准工作开始时间：</span>{{item.jhkssj?formaDate(item.jhkssj, "yyyy-MM-dd hh:mm:ss"):''}}</div>
                   <div class="item"><span class="label">批准工作结束时间：</span>{{item.jhjssj?formaDate(item.jhjssj, "yyyy-MM-dd hh:mm:ss"):''}}</div>
                   <div class="item">
-                    <van-button size="mini" @click="handleClickDetails(item)">详情</van-button>
                     <van-button size="mini" @click.stop="handleClickJxdDetails(item)">检修单</van-button>
+                    <van-button size="mini" @click="handleClickDetails(item)">查看详情</van-button>
                   </div>
                 </div>
               </div>
