@@ -1,11 +1,11 @@
 module.exports = {
   // The app title set
-  title: "一体化操作安全管控平台",
+  title: "text",
 
   // Navigation data
   navigator: [
     {
-      title: "变电操作",
+      title: "操作1",
       icon: "orders-o",
       activeIcon: "",
       name: "substationCheck",
@@ -13,7 +13,7 @@ module.exports = {
       meta: { order: 1 }
     },
     {
-      title: "厂站许可",
+      title: "操作2",
       icon: "comment-o",
       activeIcon: "",
       name: "permissiongd",
@@ -21,7 +21,7 @@ module.exports = {
       meta: { order: 2 }
     },
     {
-      title: "调度操作",
+      title: "操作3",
       icon: "description",
       activeIcon: "",
       name: "schedulingPar",
@@ -29,7 +29,7 @@ module.exports = {
       meta: { order: 3 }
     },
     {
-      title: "输电安全",
+      title: "操作4",
       icon: "records",
       activeIcon: "",
       name: "transmissionSecurity",
@@ -37,7 +37,7 @@ module.exports = {
       meta: { order: 4 }
     },
     {
-      title: "调度关联",
+      title: "操作5",
       icon: "guide-o",
       activeIcon: "",
       name: "associatedCheck",
